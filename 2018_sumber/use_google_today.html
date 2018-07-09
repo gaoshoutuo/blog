@@ -1,0 +1,81 @@
+﻿
+<html lang="en">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+        <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+        <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+        <title>自律</title>
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-45586344-1', 'yinwang.org');
+            ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <script>
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+            {
+               document.body.classList.add('mobile');
+            }
+        </script>
+
+        <!--
+        <div class="ad-banner" style="margin-bottom: 5px">
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                    style="display:inline-block;width:100%;height:90px"
+                    data-ad-client="ca-pub-1331524016319584"
+                    data-ad-slot="6657867155"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+        -->
+
+        <div class="inner">
+            <h2>从今天开始用谷歌</h2>
+            <p>外百度的信息噪音很多，当然许多答案就是国内的而不一定是stackflow上的，有可能会大片的用到英语。边学习边工作，并且保证产出。昨晚想让自己记录两个东西，总觉得是很重要的东西，给忘记了。难受</p>
+		<p>java的日期API 学习，关于Sql.Date String TimeStamp Long的相互转换
+1. 日期字符串（String）转换成日期类型（Date）
+
+
+String nowDateStr = "2016/08/15 12:13:14";
+// 注意DateFormat的格式（即yyyy/MM/dd HH:mm:ss）要与日期字符串（即2016/08/15 12:13:14）的格式相匹配
+DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+Date date = sdf.parse(nowDateStr);
+System.out.println(date.toString());
+2. 日期类型（Date）转换成日期字符串（String）
+
+Date date = new Date();
+// DateFormat的格式（即yyyy/MM/dd HH:mm:ss）就是将获得日期字符串显示的格式
+DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+String nowDateStr = sdf.format(date);
+System.out.println(nowDateStr);
+3. 日期字符串（String）转换成时间戳类型（Timestamp）
+
+
+String nowDateStr = "2016-08-15 12:13:14";
+// 注意日期字符串（即2016-08-15 12:13:14）的格式必须为yyyy-MM-dd HH:mm:ss格式
+Timestamp ts = Timestamp.valueOf(tsStr);
+System.out.println(ts);
+4. 时间戳类型（Timestamp）转换成日期字符串（String）
+
+1
+ts.toString(); 即可</p>
+
+		<p>编程语言的分类方法 按xx分类 按yy分类</p>
+
+		<p>刷题不思考不总结等于白刷</p>
+        </div>
+    </body>
+
+</html>
