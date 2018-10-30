@@ -1,0 +1,79 @@
+<html lang="en">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+        <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+        <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+        <title>自律</title>
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', 'UA-45586344-1', 'yinwang.org');
+            ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <script>
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+            {
+               document.body.classList.add('mobile');
+            }
+        </script>
+
+        <!--
+        <div class="ad-banner" style="margin-bottom: 5px">
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                    style="display:inline-block;width:100%;height:90px"
+                    data-ad-client="ca-pub-1331524016319584"
+                    data-ad-slot="6657867155"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+        -->
+
+        <div class="inner">
+            <h2>10.30 linus的talk 金庸明天写吧</h2>
+<p><b>驾驭文字是我的灵感来源</b></p>
+<p>今天也没完成任务吧，明天开始刷题了。我要审视自己到底是因为配置低呢还是因为我不专心与认真呢。但总之加油加油再加油吧</p>
+<p>再微博看到有人贴出了linus再07年google的一次关于git的talk.那人觉得很有思想，但是我中途听得昏昏入睡，直接去睡觉了。看来对于
+linus的吹捧有一点言过其实。或许是他傲慢与舞台表现的比较差吧。他讲cvs，git诞生的渊源，与git特性，设计。
+linus写git的初衷就是用来管理他的linux代码的，但是当时的cvs都是商业软件，开源世界最重要的大教堂总不能掺杂闭源公司的工具吧，于是就自己露了这么个工具。
+当然也吸取很多cvs的毛病与借鉴m开头的还是一个是bit开头的cvs软件。linus狂喷svn的人蠢，我觉得他可能不知道其实这些蠢人做的他眼里的蠢事，恰恰给他灵感。
+，cvs 领域有svn也就是很多人维持一个大的代码库，这样太中心化(Centralization)，而且不太敢于创建分支，做分支合并会很痛苦。而且会因为某些上传权限问题
+造成团队的内部斗争。他表明git每个人都是一个分支，每个人都在给自己创建一个本地的代码库，如果有需要可以从别的地方pull代码进来，但是又
+会引起其他的问题，就是两个人对于同一个文件都编辑过了，需要找他来评评理。嗯，为什么这么做呢，因为假如维护linus的linux系统有几万个人，
+就会有几万个branch分支，但是最主要的其实还是只有那么几个linus所信赖的程序员，并且pull他们所擅长领域的文件到自己的branch里面
+，这几个人组成了信赖网络。据linus说这样避免了内部的斗争，但是其实这是一种比较独裁的做法，因为branch的维护账号才可以吧别人的代码文件
+给pull到自己的branch上，本质还是在提防有些sb不要把脏代码传上来。这样有一点好大概是所有人都能参与fork,有个现场的人直接就提出了斗争只是被转移而没有小时，linus不否认。
+linus的另一个智慧就是利用网络。这样他就可以吧linux的文件保存到别人那里，然后再把镜像下载回来。这里很多应该是git所独有的。
+那么如何保证别人不动自己的镜像呢，那就要用到hash算法了,git用了hash生成一个20个字节的文件用来描述这个具有2w个文件的内核代码，
+通过下载镜像使用git hash 对镜像操作所得自己文件进行比较久知道镜像是否被更改。但是hash算法可不是什么加密算法。hash就是随机数算法
+git的安全性，他讲曾有人要捣乱他的代码，但是那些都被当时一个类似git的cvs内置的16位校验码给挡了下来。git的另一个安全性就是给linux包裹了三层
+防火墙，只有跟他一个网段的才能打开，而且不能打开邮件。
+linus从来不做备份，他是这么说的，他把文件镜像给别人，避免磁盘出现故障损坏文件。
+git又7.8w行代码，都是linus认为符合他审美，在某些需要高性能的地方，他又以性能为最好的审美，可能这个时候代码就不那么好懂了
+linus认为成为厉害的程序员需要3点特质，持续不断的努力勤奋习惯，良好的审美，他在某年的ted上也这么说，对于递归的喜爱高于循环，喜爱使用某些数据结构
+我模仿黑一黑啊，有个东西叫百度，可厉害了。它怎么用呢？你可能见过，它有个框框你可以敲字进去。然后你的命就没了。
+并且我看到自己的影子，重新用自己来理解一些词汇，信任，分布式。信任是什么呢，就是不去质疑你所信任的人的决定，给他与你等同的权限
+分布式的重点是去中心化，意思就是所有节点没有谁比谁重要，虽然那么多个节点，但是开发者会做价值判断还是会形成中心化，但没有一同往一个
+大的代码库里传代码是比较好的一件事情了。
+</p>
+<p>写作需要陈列资料并且，整理分篇章</p>
+<p>牛人做事是比较独裁的，但是又希望自己做的事情给人以自由。</p>
+<p>成熟的标志就是把我那些总结出的经验千方百计的认识记住，避免下次。</p>
+
+<p></p>
+<p>一个时代的结束的认识之人成批的凋零，或许是这个时代的结束，或许是我们这批人不再年轻。先是我们认识的人。
+然后是我们身边的人。最后，是我们自己。</p>
+        </div>
+    </body>
+
+</html>
