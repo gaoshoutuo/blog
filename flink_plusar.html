@@ -1,0 +1,75 @@
+<html lang="en">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+        <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+        <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+        <title>自律</title>
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', 'UA-45586344-1', 'yinwang.org');
+            ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <script>
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+            {
+               document.body.classList.add('mobile');
+            }
+        </script>
+
+        <!--
+        <div class="ad-banner" style="margin-bottom: 5px">
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                    style="display:inline-block;width:100%;height:90px"
+                    data-ad-client="ca-pub-1331524016319584"
+                    data-ad-slot="6657867155"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+        -->
+
+        <div class="inner">
+            <h2>2019.3.23</h2>
+<p>今天去听了一个meetup,整个人基本是懵逼的,因为我没用过flink以及听都没听过plusar这两个玩意,但是现在稍微稍微有一点懂了</p>
+<p>flink是流计算引擎,什么是流计算呢,首先计算根据数据的静态动态被分为,流计算以及批处理,流计算指的是无界的数据流什么时候都有可能来
+无限来的这种情况,批处理就是我们平常见得最多的对一堆数据进行处理,所谓的流计算要求是,实时性,低延时,高吞吐,并且必须要保证
+准确性。filink对比其他流处理引擎的不同点就是storm不具备exactly-once语义,意思就是对于确保数据的准确性不去对流数据做第二次
+计算,也就是只做一次计算,跟saprk的流处理是一种微批处理的exactly once语义,但是不能做到低延时,还有一种就是Lambda混合方案,混合批处理
+与流计算两张方案,提供两种api,不好的地方就在于在计算的窗口期出现问题就要去修改两套API,运维以及对于开发人员是在太痛苦,当当当当
+,所以基于同一种引擎要做流批混合计算的Flink就出现了</p>
+<p>使用场景就是从source得到数据,按照事件的先后顺序排队吧(忘记了),反正有三种窗口(事件窗口,计数窗口,时间窗口),事件对应按照事件排序
+,时间对应某个时间间隔下的事件,计数就是每几个组成一个大的,流数据进来通过Flink计算之后,又变成流数据传递出去,或者做缓存</p>
+<p>4种不同类型的Api抽象,TableSql,FlinkSql,DataSet/Datagram,计算</p>
+<p>那么 exactly once 这个语义特性是怎么被实现的呢,从某个partition来看,这个piepiline,对流数据过来进行标记,中间经过一些operator
+计算某一个xx值,如果计算发生错误则回滚到最近几分钟的xx值(状态)上,这种有状态值也要被持久化到二级缓存里面进去,相当于分步计算
+,至于涉及到分布式的一致性我就没怎么听懂了,很多东西都要基于云计算的去考虑,容器环境下的我也么怎么听懂,,</p>
+<p>pulsar是一个消息队列,那么市面上那么多的消息队列为什么yahoo要内部再孵化一个呢,因为现在的趋势是要做计算与存储的分离,像
+kafka,rabbitMQ,racketMq,这些都是计算跟IO耦合的比较紧的所以考虑分离,这让我感觉到了趋势,就是开源项目的方法与标准化的定义与设计,
+大公司的场景真的跟小公司是两个世界,第一代可能是kafka那样的,但是第二代马上就来了,所以要紧跟脚步</p>
+<p>pulsar通过zookeeper来管理元数据的映射,就是映射到下面哪个label分片下面的partition的segment,然后segment是系统粒度的最小单位,
+broker,bookie那一块我也没听懂...</p>
+<p></p>
+<p></p>
+<p></p>
+<p>收获是很多的,视野再次开拓,以及再次认识到杭州的好处,技术专家特地过来做meetup,真是舍不得离开呢,视野应该盯着国外的一些杂志
+消息等，如infoWorld,apache的孵化器各种顶级项目,阿里开源Blink从14年就开始fork准备了,现在看到阿里的抗数据洪峰能力都是三年前
+定下来的,阿里的人确实很厉害讲课一下子就把flink讲清楚了,娓娓道来没那么多听不懂的英文单词,还有就是要关注开源社区,,,,</p>
+<p></p>
+<p>顺便一提大酒神今天结婚了,可以说代表了我的青春,初中在游戏风云看到队长09浙大毕业就粉了,视频一期不拉,虽然后来对于商人的
+行为我有所脱粉,但是不得不记住这个在我青春很大篇幅的人的一些话语,在你没什么地位的时候不要过于在乎你的自尊,谁会不厌其烦的安慰
+那无知的少年,以及观察大局观方法论等等,就是为达目的不罢休不择手段,的确牛逼,也祝他新婚快乐开开心心</p>
+        </div>
+    </body>
+
+</html>
