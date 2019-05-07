@@ -1,0 +1,605 @@
+﻿<html lang="en">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+        <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+        <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+<style> 
+.div-c{ float:left;width:49%;border:1px solid #F00} 
+.div-d{ float:right;width:49%;border:1px solid #000} 
+
+.div-e{ float:left;width:25%} 
+</style> 
+
+        <title>自律</title>
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', 'UA-45586344-1', 'yinwang.org');
+            ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <script>
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+            {
+               document.body.classList.add('mobile');
+            }
+        </script>
+
+        <!--
+        <div class="ad-banner" style="margin-bottom: 5px">
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                    style="display:inline-block;width:100%;height:90px"
+                    data-ad-client="ca-pub-1331524016319584"
+                    data-ad-slot="6657867155"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+        -->
+
+        <div class="inner">
+            <h2>sql_base读书学习笔记</h2>
+<p>learn by doing最大的缺点就是不系统，实践中学习体系不成系统，希望能在这本书学到不常用的多表查询 group by 等等</p>
+<p><b>第零章</b></p>
+<p>关于psql的安装 数据库创建与cmd登录</p>
+<p><b>第一章</b></p>
+<p>
+<ol>
+<li>数据库的概念，救赎计算机数据集合的高效存储管理方式。dbms是什么，是数据库管理系统，用来管理数据库中的高效数据集合。
+dbms种类 hdb基本不用以及rdb主流的数据库,其中主流的关系数据库主要是以下5种<ul><li>ORACLE甲骨文公司的大项目必备 闭源</li>
+<li>MySQL使用最广泛的rdbms 开源为甲骨文公司收购</li><li>postgresql UCB开源的日本dba使用的比较多</li>
+<li>DB2 IBM公司的大型机RDBMS</li><li>SQL server微软的rdbms一般搭配.net食用</li></ul>，无关系数据库nosql，newsql新关系数据库，
+对象数据库oodb，xml数据库xmldb，k-value db键值数据库</li>
+
+<li>数据库的结构通常像一个直角尺子，依次三点ABC，A代表客户端，B代表rdbms，C代表db，A向B传输sql，B执行sql处理C中的数据,
+并将结果返回给A。哇这个结构我之前没有认真研究过这么一出来，一下子分布式的数据库我都有眉目怎么做了，将计算与存储分离，
+将rdbms与db分离。A向B输入SQL语句，B返回给A二维表的格式记录，表的行被称为记录，列被称为字段，关系数据库的读写必须以行为单位
+</li>
+
+<li>SQL概要 SQL是结构化查询语言，有国际上的标准SQL贵方，但是完全基于SQL标准来实现的RDBMS很少，但是基本都相同。根据RDBMS
+赋予的指令种类不同，SQL按用法可以分为以下3种DDL数据定义语言例如CREATE DROP ALTER操作的对象是数据库中的表等；
+DML数据操作语言例如SELECT INSERT UPDATE DELETE操作的对象是数据表中的一条或者多条记录；DCL数据控制语言例如ROLLBACK COMMIT
+GRANT REVOLE对数据库事务的操作以及对数据库账户的权限操作。实际操作中9成SQL是DML也就是对数据表中记录的操作。此外sql语句使用分号结尾
+sql的关键词是不分大小写但是变量名称得区分大小写，字符串日期等使用''括起来，数字则不用</li>
+
+<li>表的创建 一般是如下 create table tablename(
+<column name1> <type> <约束>,
+<column name1> <type> <约束>,
+<column name1> <type> <约束>
+);命名规则一般通过_来隔开单词不使用驼峰为好。数据类型常见的有int整数类型，varchar变长字符串类型，DATE型。约束有主键外键非空
+等等。
+
+表的删除
+DROP TABLE <table_name>
+表的字段更新
+ALTER TABLE <table_name> add COLUMN <column_name> <column_defination列的定义>;
+ALTER TABLE <table_name> drop COLUMN <column_name> <column_defination列的定义>;
+ALTER TABLE <table_name> rename COLUMN <column_name> <column_defination列的定义>;
+
+表更名
+ALTER TABLE <table_name1> rename TO <table_name2>
+
+表的记录插入
+INSERT INTO <table_name> VALUES(<>...);记住插入数据要开启事务并提交 BEGIN TRANSACTION COMMIT 对于mysql START TRANSACTION
+表的记录更新
+</li>
+</ol>
+</p>
+
+<p><b>第二章</b></p>
+<p>query base查询基础</p>
+<p>
+<ol>
+<li><p><b>SELECT语句基础</b></p><p><ol>
+<li><b>列的查询</b>其基础的查询语法为SELECT <column name>... FROM <table name> 由SELECT与FROM两个子句组成，当然SELECT语句还有别的用法，注意此处的查询结果与查询输入的SQL语句列顺序有关</li>
+
+<li><b>查询所有列</b>SELECT * FROM <table name>，查询结果的列顺序与建表列顺序有关</li>
+
+<li><b>为列设置别名</b>AS关键词的用法，SELECT <column name1> AS<other name1>,<column name2> AS<other name2>,... FROM <table name></li>
+
+<li><b>列的常数查询</b>我觉得此处有一些莫名其妙，例如SELECT 'zth' AS '姓名'，男 AS '性别',17 AS '年龄'... FROM student_table，这样的查询不就是赋值自己造的结果，不是查出来的
+即使结合其他有关的列总觉得很奇怪</li>
+
+<li><b>删除重复行</b>使用关键字DISTINCT 例如SELECT DISTINCT‘<column name>... FROM <table name>，相当于唯一map的key</li>
+
+<li><b>使用WHERE来选择记录</b>这个功能用的就比较的多了SELECT <column name>... FROM <table name> WHERE <条件表达式>，这里WHERE的修不修饰表字段都没关系</li>
+
+<li><b>注释的书写方法</b>注释有很多书写方式，在SQL中也有另外的一套，单行注释--，例如--SELECT * FROM student_table,其他文档多行修饰均保持一致</li>
+
+
+</ol></p> </li>
+
+<li><p><b>算数运算符与比较运算符</b></p>如同我们的编程语言一样SQL也是一门编程语言，也具备操作符的一些功能特性<ol>
+<li><b>算数运算符</b>就是+—×/这么4个为主的小学数学运算符这里举几条SQL的例子帮助理解
+SELECT 'zth' AS '姓名'，男 AS '性别',age*2 AS '年龄'... FROM student_table;
+SELECT class_name,math_graduate_avg+5... FROM student_table;</li>
+
+<li><b>注意NULL，任何与NULL进行的算数运算结果都是NULL</b> 例如5+NULL，5-NULL，4/NULL，NULL/0，你看甚至是/0。这里额外扩展一点，就是并不是所有RDBMS的SELECT语句一定要带FROM
+虽然ORACLE对此有规定必须，但是例MYSQL就允许 SELECT (100+200)*3,这怎么看都是一个表达式去计算结果为900，但是就是有时候需要临时数据来用这个一个过程算式来构造体现清晰</li>
+
+<li><b>比较运算符</b>也就是<,>,>=,<=,=,<>,值得注意的是<>代表不等于而不是><,L另外一点要注意的是不存在=<,=>这两个符号来表示不大于不小于，操作符都是严格规定好的
+下面我们来看一下SQL例子 SELECT class_name,math_graduate_avg,math_teacher... FROM student_table WHERE math_graduate_avg-10>110;
+值得注意的是日期以可以使用算术运算符来比较</li>
+
+<li><b>对字符串使用比较符的注意事项</b>例如以下'1','2','3','10','11','222','13'这几个字符串的排序不是我们心里想象的数字序而是字母序，其真实的排序为
+'1','10','11','13','2','222','3'，不要混淆数字与字符串的比较</li>
+
+<li><b>不能对NULL使用比较运算符</b>例如你不能向何处这样的表达式 class_name=NULL,应该是 IS NULL与IS NOT NULL</li>
+
+
+</ol></li>
+
+
+<li><p><b>逻辑运算符</b></p>使用逻辑运算符可以连接多个查询条件，以及其他的逻辑运算<ol>
+
+<li><p><b>NOT运算符</b></p>相比于算数运算符号的不等于<>来讲NOT运算符的修饰更加广泛通常用于否定某一个条件，但是并不是说
+NOT更加广泛，所以我们要多多使用NOT，并不是，而是要谨慎的使用NOT，例如sale_count>=200,你自然可以NOT sale_count>=200来表示
+sale_count<200,但是毫无疑问后者的表意更加清晰一点</li>
+
+<li><p><b>AND与OR表示符</b></p>在WHERE子句中经常使用这两个运算符，来组合查询条件，AND表示运算符两边的条件都成立才返回真，也被称为并且，
+OR表示在其两侧的条件只要不是两种都不成立，则输出为真，也被称为或者。相应真值表随后给出，此处举出两个SQL的例子。
+ SELECT class_name,math_graduate_avg,math_teacher... FROM student_table WHERE math_graduate_avg-10>110 AND teacher_name IS NOT NULL;
+ SELECT class_name,math_graduate_avg,math_teacher... FROM student_table WHERE math_graduate_avg-10>110 OR female_count<20;
+AND的文式图也就是集合vn图表示两个图相并的部分符号为倒U，在数学上符号位V，在编程上符号位&&，OR的文式图则为两图相交符号为U，数学符号位|，编程符号位||。
+</li>
+
+<li><p><b>括号强化</b></p>AND运算符的优先级是大于OR的，当处理2个以上条件的逻辑复合的时候，我们需要括号来介入以保证语句的执行顺序如同我们心中所表达
+例如一下的例子，SELECT product_name,product_type,regist_date FROM product WHERE product_type='办公用品' AND regist_date = '2019-4-20'OR regist_date = '2019-4-10';
+这句sql原本想要表达的意思是，查询19.4.10或者19.4.20这两天的办公用品的名称类型时间，但是执行结果却与我们所需要的结果完全不同。先执行的AND后OR，怎最后表意变为
+查询19.4.10或者19.4.20这两天的所以物品的名称类型时间，所以我们需要对SQL的OR进行括号，相似条件的聚合。修改后的SQL语句为
+SELECT product_name,product_type,regist_date FROM product WHERE product_type='办公用品' AND (regist_date = '2019-4-20'OR regist_date = '2019-4-10');
+</li>
+
+<li><p><b>逻辑运算符与真值</b></p>真值表的我列在如在位置，通过创建真值表多么复杂的条件都能够理解，但是我一般不会列似乎有点多余而且费力不讨好了，其实逻辑运算符AND也被称为逻辑积
+逻辑运算符OR也被称为逻辑和
+
+<table border="1">AND真值表
+  <tr>
+    <th>P</th>
+    <th>Q</th>
+<th>P AND Q</th>
+
+  </tr>
+  <tr>
+    <td>真</td>
+    <td>真</td>
+    <td>真</td>
+  </tr>
+
+  <tr>
+    <td>真</td>
+    <td>假</td>
+    <td>假</td>
+  </tr>
+
+  <tr>
+    <td>假</td>
+    <td>真</td>
+    <td>假</td>
+  </tr>
+
+  <tr>
+    <td>假</td>
+    <td>假</td>
+    <td>假</td>
+  </tr>
+</table>
+
+
+<table border="1">OR真值表
+  <tr>
+    <th>P</th>
+    <th>Q</th>
+<th>P OR Q</th>
+
+  </tr>
+  <tr>
+    <td>真</td>
+    <td>真</td>
+    <td>真</td>
+  </tr>
+
+  <tr>
+    <td>真</td>
+    <td>假</td>
+    <td>真</td>
+  </tr>
+
+  <tr>
+    <td>假</td>
+    <td>真</td>
+    <td>真</td>
+  </tr>
+
+  <tr>
+    <td>假</td>
+    <td>假</td>
+    <td>假</td>
+  </tr>
+</table>
+
+
+<table border="1">NOT真值表
+  <tr>
+    <th>P</th>
+    <th>NOT P</th>
+
+
+  </tr>
+  <tr>
+    <td>真</td>
+    <td>假</td>
+  </tr>
+
+  <tr>
+    <td>假</td>
+    <td>真</td>
+
+  </tr>
+
+</table>
+
+
+<table border="1">AND逻辑积
+  <tr>
+    <th>P</th>
+    <th>Q</th>
+<th>积</th>
+<th>P AND Q</th>
+
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>1</td>
+<td>1×1</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>1</td>
+    <td>0</td>
+<td>1×0</td>
+    <td>0</td>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>1</td>
+<td>0×1</td>
+    <td>0</td>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>0</td>
+<td>0×0</td>
+    <td>0</td>
+  </tr>
+</table>
+
+
+<table border="1">OR真值表
+  <tr>
+    <th>P</th>
+    <th>Q</th>
+    <th>和</th>
+<th>P OR Q</th>
+
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>1</td>
+    <td>1+1</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>1</td>
+    <td>0</td>
+    <td>1+0</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>1</td>
+    <td>1+0</td>
+    <td>1</td>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>0+0</td>
+    <td>0</td>
+  </tr>
+</table>
+
+
+<table border="1">NOT反转表
+  <tr>
+    <th>P</th>
+<th>反转</th>
+    <th>NOT P</th>
+
+
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>1->0</td>
+    <td>0</td>
+  </tr>
+
+  <tr>
+    <td>0</td>
+    <td>0->1</td>
+    <td>1</td>
+
+  </tr>
+
+</table>
+
+
+</li>
+
+<li><p><b>含有NOT的真值</b></p>SQL中的真值并非是二值逻辑真假，而是三值，多出来一个UNKNOW，NULL即为那个位置值，考虑
+UNKNOW就会变得复杂，所以许多colunmn的约束都是比not null</li>
+
+</ol></li>
+
+
+</ol>
+</p>
+
+
+
+<p><b>第三章</b></p>
+<p>聚合与排序，对表进行聚合查询，对表进行分组，为聚合结果指定条件，对查询结果进行排序。随着数据存储的增加，优势我们可能希望计算出平均值以及合计值，行汇总升序降序等等操作</p>
+<p>
+<ol>
+
+<li><p><b>对表进行聚合查询</b></p><ol>
+<li><p><b>聚合函数</b></p>比较常见以及必须会记忆的聚合函数有COUNT,SUM,AVG,MAX,MIN。顾名思义他们的意思都很好懂，先来解释什么是聚合，也就是把对行数据汇总到一行上面的操作，
+例如SUM就是对全表的某一列进行求和，使用语法SELECT <column_name>... func(*para) <column_name>...FROM <table_name>,func(para)para代表参数，也就是列名。</li>
+
+<li><p><b>计算表中数据的行数</b></p>COUNT(*),完整SQL语句 SELECT <column_name>... COUNT(*) <column_name>...FROM <table_name>,注意*代表所有也包括NULL项</li>
+
+<li><p><b>计算NULL之外的行数</b></p>COUNT(para)只要是具体某一个列名称就好，完整SQL语句SELECT <column_name>... COUNT(para) <column_name>...FROM <table_name>，注意此处计算结果不包括该
+列的NULL值。也就是会<=COUNT(*)的值，另外一个注意的点就是，仅仅只有COUNT接受*这个参数，其他4个不接受。COUNT(<列名>)这样形容会更好</li>
+
+<li><p><b>计算合计值SUM</b></p>SUM(<列名>)，完整SQL语句 SELECT SUM(sale_price),SUM(pruchase_price) FROM Product,那么可能要问了假如这些列中包含NULL值，根据前一章的任何与NULL
+进行算数运算符运算的值都是NULL，岂不是算出来为NULL。你说的没错，但是SUM会把NULL值挑出来丢掉，这与将NULL比作'0'是不一样的,这就是SUM等4兄弟厉害的地方了啊</li>
+
+<li><p><b>计算合计值AVG</b></p>AVG(<列名>)，完整SQL语句 SELECT AVG(sale_price),AVG(pruchase_price) FROM Product,此处的NULL值也是被丢弃掉计算非NULL的SUM/非NULL的COUNT，但是也有将NULL
+当作0的用法，此时地下的COUNT自然而然将计算非NULL的值，这种方法我们放到第六章再讨论</li>
+
+
+<li><p><b>计算最大/最小值MAX/MIN</b></p>MAX(<列名>)，完整SQL语句 SELECT MAX(sale_price),MAX(pruchase_price) FROM Product;MIN(<列名>)，
+完整SQL语句 SELECT MIN(sale_price),MIN(pruchase_price) FROM Product;,当然此处要提最大最小值函数与和平均值的区别，最大最小值能够比较日期，但是日期的平均与求和
+似乎没有什么意义。也就是最大最小值不仅仅接受数字也接受日期</li>
+
+
+<li><p><b>使用聚合函数去除重复值DISTINCT</b></p>这里要注意的点就是DISTINCT要写在聚合函数的括号里头，不要写在外头这是两个不同意思的表达。下面给出SQL的例子
+SELECT COUNT(DISTINCT product_type) FORM Product; SELECT DISTINCT COUNT(product_type) FORM Product;前者先删除重复数据在计算数据行数，后者先计算数据行数在删除重复数据，当然
+不仅仅限与COUNT其他聚合函数也是这样子</li>
+
+
+</ol></li>
+
+
+
+<li><p><b>对表进行分组 GROUP BY</b></p><ol>
+<li><p><b>GROUP BY子句</b></p>GROUP BY的作用就是根据数据聚类所修饰行，对表数据进行规律排列，是无序的非顺序，只能在SELECT子句之中使用，并且不能使用SELECT中列的别名且WHERE
+子句不能使用聚合函数至于原因接下来会一一到来。聚合都是针对表中的所有数据进行的汇总处理其语法结构如下SELECT <column name>... FROM <table name> GROUP BY <column name>...;
+举一个SQL例子SELECT <product_type>,COUNT(*) FROM <Product> GROUP BY <product_type>;意思就是把产品表按照产品类型先聚类，然后计算各种类型的数量。算了还是把表格给出吧不然太空了
+<table border="1">
+  <tr>
+    <th>Product_type</th>
+    <th>Product_name</th>
+    <th>Product_id</th>
+    <th>Product_price</th>
+    <th>purchase_price</th>
+    <th>regist_date</th>
+  </tr>
+  <tr>
+	<td>衣服</td>
+    <td>T恤</td>
+    <td>0007</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+<tr>
+	<td>衣服</td>
+    <td>运动T恤</td>
+    <td>0003</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>办公用品</td>
+    <td>打孔器</td>
+    <td>0004</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>办公用品</td>
+    <td>打孔器</td>
+    <td>0005</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>办公用品</td>
+    <td>尺子</td>
+    <td>0001</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>厨房用具</td>
+    <td>菜刀</td>
+    <td>0002</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>厨房用具</td>
+    <td>高压锅</td>
+    <td>0006</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>厨房用具</td>
+    <td>叉子</td>
+    <td>0009</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+
+<tr>
+	<td>厨房用具</td>
+    <td>筷子</td>
+    <td>0007</td>
+    <td>1000</td>
+    <td>500</td>
+    <td>2009-4-27</td>
+  </tr>
+</table>
+这是GROUP BY的过程 最后还有COUNT，最终结果有点类型下表自己想象吧不花了。
+</li>
+
+<li><p><b>聚合键包含NULL的情况</b></p>会以空行的形式表现出来
+<table border="1">
+  <tr>
+    <th>purchase_price</th>
+    <th>count</th>
+  </tr>
+  <tr>
+    <td>  </td>
+    <td>2</td>
+  </tr>
+
+ <tr>
+    <td>衣服</td>
+    <td>3</td>
+  </tr>
+
+ <tr>
+    <td>办公用品</td>
+    <td>2</td>
+  </tr>
+
+ <tr>
+    <td>厨房用具</td>
+    <td>6</td>
+  </tr>
+</table>
+当聚合键包含NULL数据时会以不确定也就是空行表现在结果上面，值得注意的是目前虽然没有出现其他两个但是SQL的书写顺序还是 1.SELECT->2.FROM->3.WHERE->4.GROUP
+</li>
+
+<li><p><b>WHERE中的GROUP BY的执行结果</b></p>语法通常SELECT <column name>... FROM <table name> WHERE <条件> GROUP BY <column name>...;其执行顺序如下
+1.FROM->2.WHERE->3.GROUP BY->4.SELECT，这与之前的书写顺序不同这也是SQL可读性差的原因</li>
+
+<li><p><b>GROUP BY使用的常见错误</b></p>在SELECT中书写了多余的列，SELECT的列只能在GROUP BY中出现过的，这个问题想想也能够理解，例如我们对价格进行GROUP BY，对商品名称 COUNT与价格进行查询
+万一同价格的数量有多个但是商品名称不同我们应该显示谁呢。这是表意不明的语法不支持。常见错误之二就是在GROUP BY中出现SELECT 子句中列名的别名，这是错误的，原因就是GROUP的执行
+顺序是先于SELECT执行到GROUP BY的时候别名还没有命名呢，但是PostgreSQL却可以在其他的DBMS是不行的，常见错误就是认为GROUP BY的结果是排过序的，事实上其实是无序的。常见错误之4
+在WHERE子句中使用聚合函数,例如WHERE COUNT(*)=2,实际上只有HAVING ORDER BY SELECT三个才能使用聚合函数，这些设计的细节让使用者去记忆不仅2让我想起王垠怒斥UNIX的那些作者以及
+程序语言的宗教</li>
+
+<li><p><b>额外专栏---</b></p>可能有细心的人以及发现GROUP BY与DISTINCT能够实现相同的功能 例如SELECT DISTINCT price FROM< Product；与SELECT price FROM Product GROUP BY price;
+其结果都是为表去重，当然都保留下NULL值，但是我们从问题出发解决的话，要按照语句的语义来，很明显前者被用来直接的去重，后者是分组表数据汇总的用法。</li>
+
+</ol></li>
+
+
+
+<li><p><b>为聚合结果指定条件 HAVING</b></p></li>
+
+
+
+<li><p><b>对查询结果进行排序 ORDER BY</b></p></li>
+ 
+</ol>
+</p>
+
+
+
+
+
+
+
+<div>
+<div class="div-c">
+123
+</div>
+<div class="div-d">
+234
+</div>
+</div>
+
+
+
+<p><b>第n章</b></p>
+<p>what看熟</p>
+<p>
+<ol>
+<li></li>
+
+<li></li>
+
+<li></li>
+
+<li></li>
+</ol>
+</p>
+
+<li><p><b>SELECT语句基础</b></p></li>
+
+<table border="1">
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  <tr>
+    <td>January</td>
+    <td>$100</td>
+  </tr>
+</table>
+
+<a href=""></a>
+<ol><li></li></ol>
+<ul><li></li></ul>
+<p></p>
+
+<p></p>
+<p></p>
+<p></p>
+        </div>
+    </body>
+
+</html>
