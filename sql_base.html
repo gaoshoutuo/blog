@@ -531,19 +531,208 @@ SELECT COUNT(DISTINCT product_type) FORM Product; SELECT DISTINCT COUNT(product_
 在WHERE子句中使用聚合函数,例如WHERE COUNT(*)=2,实际上只有HAVING ORDER BY SELECT三个才能使用聚合函数，这些设计的细节让使用者去记忆不仅2让我想起王垠怒斥UNIX的那些作者以及
 程序语言的宗教</li>
 
-<li><p><b>额外专栏---</b></p>可能有细心的人以及发现GROUP BY与DISTINCT能够实现相同的功能 例如SELECT DISTINCT price FROM< Product；与SELECT price FROM Product GROUP BY price;
+<li><p><b>额外专栏---</b></p>可能有细心的人以及发现GROUP BY与DISTINCT能够实现相同的功能 例如SELECT DISTINCT price FROM Product；与SELECT price FROM Product GROUP BY price;
 其结果都是为表去重，当然都保留下NULL值，但是我们从问题出发解决的话，要按照语句的语义来，很明显前者被用来直接的去重，后者是分组表数据汇总的用法。</li>
 
 </ol></li>
 
 
 
-<li><p><b>为聚合结果指定条件 HAVING</b></p></li>
+<li><p><b>为聚合结果指定条件 HAVING</b></p><ol>
+
+<li><p><b>HAVING子句</b></p>之前出现的SQL 无法在WHERE执行聚合函数，即搜索COUNT=2的分组结果，此时我们可以讲利用HAVING就能做这样的事情。WHERE通常被用来指定行的条件，
+比如sale_price=2,但是不能呢个被用来指定组的条件，HAVING就是用来挑选组条件的工具。其基本语法如下SELECT <column_name>... FROM<table_name> GROUP BY <column_name> HAVING <column_name>;
+在书写顺序上SELECT->FROM->WHERE->GROUP BY->HAVING,一定要书写在GROUP BY的后面，此外在HAVING中能够使用聚合函数，例如 HAVING COUNT(*)=2;</li>
+
+
+<li><p><b>HAVING子句的构成要素</b></p>常数 聚合函数 GROUP BY指定的聚合键，毕竟是对分组结果进行挑选么。从语义上面也很容易理解</li>
+
+
+<li><p><b>WHERE与HAVING的适用场景</b></p>有时候我们的两个SQL语句运用WHERE或者HAVING会出现同样的结果，当我们执行的程序想要表达约束行条件的时候自然用WHERE，当约束为组条件的时候用HAVING。
+而且一般情况都是对行做的，并且WHERE的速度是要大于HAVING，因为在HAVING中使用聚合函数的时候DBMS内部会进行排序，而WHERE相当于提前把行记录筛选出来。做技术的复读机拾人牙慧的大神...</li>
+
+
+</ol></li>
 
 
 
-<li><p><b>对查询结果进行排序 ORDER BY</b></p></li>
+<li><p><b>对查询结果进行排序 ORDER BY</b></p><ol>
+
+<li><p><b>ORDER BY</b></p>使用ORDER BY是用来排序查询结果。其基本语法如下 SELECT <column_name>... FROM<table_name> GROUP BY <column_name> HAVING <column_name> ORDER BY <column_name>;
+默认是按照升序排列，也就是从小到大，关键词AEC，降序排列是DESC，如语法所示其关键词摆放顺序SELECT->FROM->WHERE->GROUP BY->HAVING->ORDER BY,可以省略。</li>
+
+
+<li><p><b>指定升降序</b></p>我们也可以直接通过关键词来直接指定排序键的升降序，其基本语法 ORDER BY <column_name> DESC/AEC...，单词ascendent是上升的意思，descendent是下降的意思。</li>
+
+
+<li><p><b>指定多个排序键</b></p>当排序出现相同值的时候则我们需要新的条件去为其做细分。此时就需要多个排序键，NULL的顺序，我们在前面的知识了解到不能对NULL做算术运算符的计算，
+在DBMS中含NULL的记录在排序中会被放在结果的首部或者尾部，详细要看DBMS。</li>
+
+
+<li><p><b>排序键使用别名</b></p>我们在ORDER BY的排序键中可以使用别名，因为其实际执行的顺序如下，FROM->WHERE->ORDER BY->HAVING->SELECT->ORDER BY,SELECT子句处于ORDER BY之前，GROUP BY
+之后我们，此则为原因。另外在ORDER BY中可以使用非聚合键作为排序键和使用SELECT中的列别名，这也很好理解因为排序是对最后SELECT子句排序，则适用范围为全表字段，聚合函数也可以在ORDER BY中使用，此外有一个奇淫技巧
+就是通过列编号替代列名，比如1代表第一列的列名，4代表第四列的列名。这种方法其实早已经被标记是过期以及危险的方法希望不要去使用，因为这么一来SQL语句更加缺乏可读性以及在将来DBMS的升级过程中会出现错误。</li>
+
+</ol></li>
  
+</ol>
+</p>
+
+
+
+<p><b>第4章 数据更新</b></p>
+<p>插入删除更新事务</p>
+<p>
+<ol>
+
+<li><p><b>数据的插入(INSERT语句的使用方法)</b></p><ol>
+
+<li><p><b>什么是INSERT</b></p>前面我们介绍了创建表的CREATE TABLE语句，通过CRATE TABLE创建而出的表是一个有结构的空箱子，此时我们把数据插入才能叫做数据库。用来装入数据的操作就叫INSERT。
+要学习INSERT语句我们首先要创建一个表
+<p>CREATE TABLE Product(</p>
+<p>product_id char(4) NOT NULL,</p>
+<p>product_name varchar(30) NOT NULL,</p>
+<p>product_type varchar(100) NOT NULL,</p>
+<p>sale_price INTEGER DEFAULT 0,</p>
+<p>purchase_price INTEGER ,</p>
+<p>regist DATE ,</p>
+<p>PRIMARY KEY(product_id)</p>
+<p>);</p>
+好了我们已经创建出一个表了，但是并没有往里面插入数据，接下来就向这里面插入数据。INSERT的基本语法INSERT INTO <table_name>(<column_name>...) VALUES(values...);
+例如我们向商标插入 INSERT INTO TABLE Product (product_id,product_name,product_type,sale_price,pruchase_price,regist_date) VALUES ('0001','T恤','衣服',1000,500,'2009-4-5');
+像这种将列名与值分开的写法叫做清单，当然清单两边的数量要保持一致，不值一会出错也就无法插入数据，原则上插入操作每次只插入一条语句，如果需要多次插入则需要使用循环。但原则毕竟是原则，真正按照原则办的事情并不多，
+下面我们介绍一种一条INSERT语句的插入多条语句的写法。INSERT INTO TABLE Product (product_id,product_name,product_type,sale_price,pruchase_price,regist_date) VALUES ('0001','T恤','衣服',1000,500,'2009-4-5'),
+('0002','运动T恤','衣服',1020,500,'2009-4-5'),('0003','短裤','衣服',100,50,'2009-4-5'),('0004','短袖','衣服',100,50,'2009-4-25'),('00051','羽绒服','衣服',1000,500,'2009-4-15');
+像这种格式的多值清单单列清单就可以多插入数据，但是并不是所有的DBMS都符合该死的ORACLE就不一样。
+INSERT ALL INTO TABLE Product (product_id,product_name,product_type,sale_price,pruchase_price,regist_date) VALUES ('0001','T恤','衣服',1000,500,'2009-4-5'),
+INTO Product('0002','运动T恤','衣服',1020,500,'2009-4-5'),INTO Product('0003','短裤','衣服',100,50,'2009-4-5'),INTO Product('0004','短袖','衣服',100,50,'2009-4-25'),INTO Product('00051','羽绒服','衣服',1000,500,'2009-4-15')
+SELECT *FORM DUAL;其中DUAL表示临时表不能作为INSERT与UPDATE的对象。
+ </li>
+
+<li><p><b>列清单的省略，插入NULL，默认值，从其他表复制数据</b></p>假如我们对全表数据进行插入的话那么列清单可以省略，例如 INSERT INTO TABLE Product VALUES ('0001','T恤','衣服',1000,500,'2009-4-5');
+当然我们也可以往数据表里面插入NULL值只需要在相应位置设置NULL，例如 INSERT INTO TABLE Product VALUES ('0001','T恤','衣服',1000,500,NULL);但是对于非空NOTNULL的字段插入NULL会出错，也就是不执行这条SQL，不影响别的结果。
+我们还可以向表中插入默认值，通常有显式与隐式两种，显式则是在存在DEFAULT约束的字段的VALUES空位插入DEFAULT，例如('0001','T恤','衣服',DEFAULT,500,NULL);
+还有隐式的做法就是把DEFAULT字段的列清单与值清单中都省略，例如INSERT ALL INTO TABLE Product (product_id,product_name,product_type,pruchase_price,regist_date) VALUES ('0001','T恤','衣服',500,'2009-4-5'),值得注意的是所有列的默认为NULL。
+当然我们还有INSERT...SELECT语法，这个语法一般被用来分表以及备份，就是将查询表的数据读出来插入到插入表中，两个数据表的结构要相同，假设我们现在有另一个ProductCopy表与Product表相同，下面我们举个例子。
+ INSERT INTO TABLE ProductCOPY (product_id,product_name,product_type,sale_price,pruchase_price,regist_date) SELECT product_id,product_name,product_type,sale_price,pruchase_price,regist_date FROM Product GROUP BY(product_type);
+原表数据并不会发生改变，而且INSERT语句中的SELECT可以使用WHERE但是使用ORDER BY并不会发生任何效果。</li>
+
+</ol></li>
+
+
+
+<li><p><b>数据的删除(DELETE语句的使用方法)</b></p><ol>
+
+<li><p><b>DROP TABLE与DELETE</b></p>DROP TABLE可以将表容器完全删除，而DELETE知识对表中的数据进行操作会留下表容器。本节提到的删除也只是删除DELETE，此外删除数据要谨慎一旦删除则很难恢复
+DELETE的基本语法 DELETE FROM TABLE，例如DELETE FROM Product;则是将Product表中的数据完全删除，当然也有WHERE修饰DELETE来搜索指定删除行，例如DELETE FROM Product WHERE product_name='菜刀';
+与SELECT不同的是此处不能使用GROUP BY HAVING ORDER BY这么几个关键词，想来也是简单这有什么意义呢。此外还有另一个关键TRUNCATE叫做舍弃操作起来比DELETE更快，与DELETE不同的是舍弃
+是舍弃全表的数据而不仅仅是行为单位，没有WHERE约束，这通常是DML语句，但是在奇葩的ORACLE中又是DDL语句。</li>
+
+</ol></li>
+
+
+
+<li><p><b>数据的更新(UPDATE语句的使用方法)</b></p><ol>
+
+<li><p><b>UPDATE语句的基本语法</b></p>UPDATE TABLE SET <column_name>=value,... where<cond>;例如UPDATE Product SET regist_date='2008-10-10';此外还有where指定的搜索型
+例子如下，UPDATE Product SET regist_date='2008-10-10' WHERE product_name='菜刀';NULL也可以被当作一个值来更新进去，但仅限与为设置NOT NULL的列。当然还有多列更新像多条插入一样SET
+后的条件用逗号分隔，例如 UPDATE Product SET regist_date='2008-10-10'.product_price=purchase*3 WHERE product_name='菜刀';在DB2与PostgreSQL中也有另外一种写法例子如下 
+ UPDATE Product SET(regist_time,product_price)=('2008-10-10',purchase*3) WHERE product_name='菜刀';</li>
+</ol></li>
+
+
+
+<li><p><b>事务</b></p><ol>
+
+<li><p><b>什么是事务，创建事务</b></p>很多概念突如其来的出现并且与生活中的词汇重叠，但是在数据库中的事物可跟公司的事务并不同，数据库中的事物代表处理单元的中的一些列更新数据的集合，数据库通过
+事务的提交与回滚来对数据进行更新操作。当我们需要执行多句语句SQL的时候，事务就派上用场，你可以把SQL当作编程语言的中stamement语句以及事务当作sync包裹的method其基本的表达语法如下,
+开启事务 DML1;DML2;DML3...; 提交事务/回滚事务,不同的DBMS对应不同的开始语句例如MYSQL就用START TRANSACTION，PG与SQL SERVER就使用BEGAIN TRANSACTION,而ORACLE与DB2则无，那么可能就觉得很奇怪没有的话怎么开启提交事务呢，
+事实上因为标准的SQL规定一种悄悄开启事务方法。COMMIT 提交需要注意的是事务中的某个DML发生错误不影响全局只是这句话失效，COMMIT之后就没办法恢复了，特别是DELETE要特别小心。
+ROLLBACK事务的回滚，只要没有被COMMIT就没有算写入到DBMS中。插个题外话，事务处理是何时开始的，事实上事务是数据库一连接就已经开始，事务分成两组不同的提交，前者为自动提交，每条语句都是一个事务，默认使用的SQL Server，PG，MySQL等
+而对于ORACLE则需要用户去指出提交与回滚操作，自动提交有个弊端就是DELETE数据自动提交没法恢复数据，总金额里一定要特别小心，我的经验关于MySQL+Hibernates，UPDATE跟DELETE都被取消自动提交事务，需要用户手动提交与回滚。</li>
+
+<li><p><b>ACID特性</b></p>这是数据库事务的意义设计要求，就是原子性(Atomicity),一致性(Consistency),隔离性(Isolation),持久性(Durability),下面分头对着4个概念进行讲解<ul>
+<li>原子性，就是事务所包裹的所有DML语句，在事务结束的时候，要么全部执行要么一句都不执行</li>
+<li>一致性，就是事务中的语句如果发生错误则回滚本句，就是本句不执行，然后继续执行完全部</li>
+<li>隔离性指的是事务之间的隔离，A事务处理123句DML如果没提交之前数据不发生改变，B事务也看不见正在改变，只有等到A事务提交完成之后数据更新B事务再执行则能看到</li>
+<li>持久性，指的是事务事务在提交或者回滚之后DBMS一定能保证其成功，发生故障是则将事务存储到存储介质上或者日志，等到DBMS复原后在进行事务。当发生故障可以通过日志恢复到之前的记录。也就是数据库故障导致数据丢失也能通过某种方式把数据找回来</li>
+</ul></li>
+</ol></li>
+
+</ol>
+</p>
+
+
+
+
+<p><b>第五章</b></p>
+<p>复杂查询,子查询,关联查询</p>
+<p>
+<ol>
+<li><p><b>视图</b></p></li>
+
+<li><p><b>子查询</b></p></li>
+
+<li><p><b>关联子查询</b></p></li>
+</ol>
+</p>
+
+
+
+
+<p><b>第六章</b></p>
+<p>函数,谓词,CASE表达式</p>
+<p>
+<ol>
+<li><p><b>函数</b></p></li>
+
+<li><p><b>谓词</b></p></li>
+
+<li><p><b>CASE表达式</b></p></li>
+</ol>
+</p>
+
+
+
+
+<p><b>第七章</b></p>
+<p>集合运算，联结。并查集的算法</p>
+<p>
+<ol>
+<li><p><b>集合运算</b></p></li>
+
+<li><p><b>联结</b></p></li>
+
+</ol>
+</p>
+
+
+
+
+<p><b>第八章</b></p>
+<p>窗口函数，GROUPING运算符</p>
+<p>
+<ol>
+<li><p><b>窗口函数</b></p></li>
+
+<li><p><b>GROUPING运算符</b></p></li>
+
+
+</ol>
+</p>
+
+
+
+
+<p><b>第九章</b></p>
+<p>通过应用程序连接数据库，JAVA基础，JAVA连接PostgreSQL</p>
+<p>
+<ol>
+<li><p><b>通过应用程序连接数据库,与应用世界的连接</b></p></li>
+
+<li><p><b>JAVA基础</b></p></li>
+
+<li><p><b>JAVA连接PostgreSQL</b></p></li>
 </ol>
 </p>
 
@@ -568,13 +757,11 @@ SELECT COUNT(DISTINCT product_type) FORM Product; SELECT DISTINCT COUNT(product_
 <p>what看熟</p>
 <p>
 <ol>
-<li></li>
+<li><p><b>SELECT语句基础</b></p></li>
 
-<li></li>
+<li><p><b>SELECT语句基础</b></p></li>
 
-<li></li>
-
-<li></li>
+<li><p><b>SELECT语句基础</b></p></li>
 </ol>
 </p>
 
