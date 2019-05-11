@@ -665,15 +665,28 @@ ROLLBACK事务的回滚，只要没有被COMMIT就没有算写入到DBMS中。�
 
 <p><b>颓废两天不应该，川普明确宣布加税而且中国谈判基本破裂了，股市居然还能大涨是在是非常非常奇奇怪怪的事情。</b></p>
 
+
 <p><b>第五章</b></p>
 <p>复杂查询,子查询,关联查询</p>
 <p>
 <ol>
-<li><p><b>视图</b></p>VIEW</li>
+<li><p><b>视图</b></p>视图和子查询恰当的使用能够增加SQL的灵活性，从SQL的角度来看视图其实是一样的，区别在于表是存储数据的而视图则是存储SELECT语句的。视图会在内部进行查询并创建出一个临时表
+，零时表并不会存储在任何位置。使用视图的好处具体有两点，第一点是无序保存数据保存好数据的映射绑定，不会因为原表的更新附表存在落后的问题，第二点是将频繁使用的SELECT封装。创建视图的方法CREATE VIEW <view_name>(<columns_name...>) AS <SELECT statament>;
+具体SQL的例子。CREATE VIEW test_view(sum_price,avg_price) AS SELECT SUM(sale_price),AVG(sale_price) FROM Product WHERE product_type='衣服';VIEW被创建出来就是作为一张表去使用的，如
+SELECT * FROM test_view ;如此一来就是两层查询，先查询内后查询外，这点在SICP以及各种代数式子解码自不必说，但是要尽量的使用单一视图，即不再视图中使用视图，这样会造成性能的浪费，因为这是递归会占用on的内存，
+而且会造成语义不明需要一层一层的回头看组合。此外视图还存在两种限制，其一是为ORDER BY因为视图中的数据是不存在顺序的但是在PG中又使用。插个题外话，UBER上市了，UBER的技术路线在iNFOQ我还没仔细去看，但是一条非常搞笑的
+评论引起我的注意，这就是那个从MySQL转到PostgreSQL又转到MySQL的公司吗，哈哈看起来现在MySQL也没有用那么不堪，PG倒是挺尴尬。其限制之二就是无法对VIEW执行DML语句，即视图的更新，说了视图中并不存在数据，而且视图中的字段与原表不一定全匹配，
+当然满足以下条件还是能够更新的，SELECT未是使用DISTINCT，没有GROUP子句，未使用HAVING，FROM中只有一张表，总之就是既没有聚合又没有结合的查询才满足条件。删除视图跟表相似，直接DROP VIEW view_name;,此外再次注意一些事情，
+就是一个视图万一要是作为其他视图的依赖是不能够直接被删除的，就像IDE里面会提醒DELETE ANYWHERE，我们dbms提供了 DROP VIEW view_name CASCADE这样的语句来执行。</li>
 
-<li><p><b>子查询</b></p>临时变量</li>
+<li><p><b>子查询</b></p>一言蔽之子查询就是一次性的视图，在SELECT语句执行完毕之后就会消失，标量子查询就是每次返回一行一列的子查询。例如
+SELECT prodict_type,cnt_product FROM (SELECT product_type,count(*)AS cnt_product,FROM Product)AS sub_view;同样的先外层后内层，同样的避免多重嵌套，标量子查询的好处就在于，我们无法在WHERE中使用聚合函数，但是聚合函数封装在标量子查询中
+则就很妙。这样看起来就不像子查询了不需要命名，而之前的那个原则上需要命名。不仅仅被在WHERE里基本都可以用，而且要注意必须得之返回一个哦。</li>
 
-<li><p><b>关联子查询</b></p></li>
+<li><p><b>关联子查询</b></p>假设存在一个问题，我们需要找出在类型相同的商品中价格高于平均值的类型，名称等等参数需要怎么做呢，很明显我们想到WHERE约束的要返回前查询所需要的AVG，
+那么我们就不要关联起来，这里看一条SQL语句就明白了，SELECT product_name,product_type,sale_price FROM Product AS p1 WHERE p1.sale_price>(SELECT AVG(sale_price)FROM Product AS p2 WHERE
+p1.product_type=p2.product_type GROUP BY product_type)重点在与P1与P2的prodcut_type相等是点睛之笔，而且要注意作用域的问题在内查询中自然可以使用外查询的资源别名而外查询则看不到内查询，就如JAVA的内部类，
+关联子查询通常的使用场景都是对集合的划分</li>
 </ol>
 </p>
 
