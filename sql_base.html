@@ -698,7 +698,35 @@ p1.product_type=p2.product_type GROUP BY product_type)重点在与P1与P2的prod
 <p>函数,谓词,CASE表达式</p>
 <p>
 <ol>
-<li><p><b>函数</b></p></li>
+<li><p><b>函数</b></p>好了经过一段时间的颓废不专心致志，我终于把本书完成了。SQL中的函数，对于所有的编程语言来讲函数都起着至关重要的作用，函数像是编程语言的道具箱，每种语言都具备非常多的函数，方便我们实现各种类型结构的数据进行计算。
+根据用途SQL中的函数有被分为以下几类，算术函数，字符串函数，日期函数，转换函数，聚合函数，期中聚合函数我们已然理解，就看看其他四类函数的家族成员。算术函数<ul><li>有+-*/（这不是操作符么，虽然c++里面有操作符重载）这也能叫函数吗。</li>
+<li>ROUND四舍五入的函数 语法ROUND（对象数值，小数位数）</li>
+<li>ABS绝对值函数 语法ABS（数值）</li>
+<li>MOD求余函数 modulo的缩写 MOD（被除数，除数）在SQL Server又可以使用%来做MOD</li>
+
+</ul>下面介绍字符串函数，主要作用就是对字符串进行替换截取简化等操作<ul>
+<li>||拼接 str1||str2,注意在任意字符串出现NULL则最终结果也是NULL这点与编程语言不通，允许多连接，特定的DBMS SQLSERVER中使用 +号比较的编程语言化，在MYSQL中使用CONCAT(str...)</li>
+<li>LENGTH()字符串长度，SQL Server中使用LEN（），对于汉字某些编码一个字符可能会统计出很多个字节出来2或者3，英文字符都是单字节。</li>
+<li>LOWER（字符串）小写 UPPER（字符串）大写</li>
+<li>REPLACE()字符串替换函数，REPLACE(a,b,c);分别代表对象字符串，替换前的字符串，替换后的字符串，就是对a字符串中的所有b都替换成c，例如replace（abcabc，b，c）=accacc</li>
+<li>字符串的截取，SUNSTRING左闭右开原则，SUNSTRING（a from b num）对a字符串的b位置开始后面num个字符数，在SQL SERVER中SUNSTRING(a,b,num),oracle/db2SUNSTR(a,b,num)</li>
+</ul>下面介绍日期函数<ul>
+<li>CURRENT_DATE当前日期，对于ORACLE则要FROM dual对于DB2则要FROM SYSTEM.SYSDUMY1例如2018-1-1</li>
+<li>CURRENT_TIME当前时间例如17:26:50.996+09,在SQL Server中则要SELECT CAST(CURRENT_TIMESTAMP AS DATE) AS CUR_DATE,在ORACLE中SELECT CURRENT_TIMESTAMP FROM DUAL,在DB2中SELECT CURRENT TIME FROM SYSTEM.SYSDUMMY1</li>
+<li>CURRENT_TIMESTAMP,当前的日期与时间，时间戳，SELECT CURRENT_TIMESTAMP,对于ORACLESELECT CURRENT_TIMESTAMP FROM DUAL。对于DB2 SELECT CURRENT TIMESTAMP FROM SYSTEM.SYSDUMMY1</li>
+<li>EXTRACT 截取日期时间EXTRACT(日期元素 FROM 日期)，例如PG与MYSQL SELECT CURRENT_TIMESTAMP 
+EXTRACT(YEAR FROM CURRENT_TIMESTAMP)AS year,
+EXTRACT(MONTH FROM CURRENT_TIMESTAMP)AS month,
+EXTRACT(DAY FROM CURRENT_TIMESTAMP)AS day,
+EXTRACT(HOUR FROM CURRENT_TIMESTAMP)AS hour,
+EXTRACT(MINUTE FROM CURRENT_TIMESTAMP)AS minute,
+EXTRACT(SECOND FROM CURRENT_TIMESTAMP)AS second;而在SQL Server中则换用DATEPART(日期元素，日期)，ORACLE FROM DUAL，DB2 FROM SYSTEM。SYSDUMMY1</li>
+
+</ul>最后介绍一类比较特殊的函数也就是转换函数<ul>
+<li>CAST函数 类型转换 CAST(value AS TYPE),例如 CAST（'0001' AS INTEGER）CAST（'2017-11-23' AS DATE）从上面可以看出字符串转换成日期看不出什么变化，这种是留给DBMS内部做的</li>
+<li>COALESCE 合并，该函数是SQL特有函数会返回可变参数，即从左侧开始第一个不是NULL的值，参数个数是可变的 ，类似JAVA里的数组...形参，避免NULL的发生，例如COALESCE(NULL,1) COALESCE(NULL,NULL,'2009-4-8') COALESCE(NULL,'test',NULL)  则分别返回 1 2009-4-8 test</li>
+</ul>聚合函数在此不再赘述
+</li>
 
 <li><p><b>谓词</b></p></li>
 
