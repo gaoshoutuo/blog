@@ -728,9 +728,34 @@ EXTRACT(SECOND FROM CURRENT_TIMESTAMP)AS second;而在SQL Server中则换用DATE
 </ul>聚合函数在此不再赘述
 </li>
 
-<li><p><b>谓词</b></p></li>
+<li><p><b>谓词</b></p>所谓谓词在SQL中的含义就是返回值为真值的函数，在本章我们掌握like的三种用法，between包含的3个参数，取NULL注意使用 IS NULL，子查询作为 IN或者EXISTS的参数。其实我们早就接触过谓词，即+-=这些比较运算符，的
+另一个名称就叫做比较谓词，通常来讲函数的返回值存在各种类型，但是谓词在SQL的返回值就是3种真值。一下一次讲解 like，BETWEEN，IS NULL IS NOT NULL，IN NOT IN，EXISTS NOT EXISTS等几个谓词<ol>
+<li><p><b>LIKE谓词，字符串部分的一致查询</b></p>我们之前做查询的时候条件基本都是比较运算符起作用，但是LIKE提供一种比较模糊的方式去表达，其主要包含以下3中，前方一直，中间一致以及后方一致，
+例如对于一下几个字符串abcddd，dddabc，abdddc，abcdd，ddabc，abddc，当使用ddd作为like的模糊字符串，对于前方一致则选出dddabc，对于中间一致就会选出abcddd，dddabc，abdddc。当后方一致就会选出abcddd。像这样不使用=来
+指定某些字符串的方式我们称作模式匹配，最早可以追溯到SCHEME哦。对于前方一致我们的条件是 LIKE 'ddd%',此处%代表0个以上的任意字符。对于中间一致则使用LIKE '%ddd%',对于后方一致则使用LIKE '%ddd',此外在SQL中_下划线代表任意一个字符。正则表达式我学了好几次由于用的不多于是又忘记了，还是需要多多总结或者刻刀记忆</li>
 
-<li><p><b>CASE表达式</b></p></li>
+<li><p><b>BETWEEN范围查询</b></p>其语法如下 BETWEEN value1 and value2，我们在使用<>这符号的时候是开区间，而BETWEEN则是闭区间</li>
+
+<li><p><b>IS NULL IS NOT NULL判断是否为NULL</b></p>不再赘述</li>
+
+
+<li><p><b>IN NOT IN OR的简便用法</b></p>当我们出现某个变量的多个OR条件的时候则使用IN比较简便，例如 WHERE sale_price=1000 OR sale_price=2000 OR sale_price=3000,则我们可以使用 WHERE IN sale_price(1000,2000,3000).IN（.....）值得注意的是IN和NOT IN是无法选出NULL值的，并且在多变量的时候还是用回OR吧。
+我们之前学会子查询，就是创建出一张临时表，在书本的P206，表我就不再画出了，反正是商店商品表与商品表，当我们想要选出商店ID为某值的商品名称，售价时我们需要子查询。SQL:SELECT product_name,sale_price FROM Product WHERE product_id IN(
+SELECT  product_id FROM ShopProduct WHERE shop_id='value');相当于product_id in（'003','004','006','007'）;得益于两张表的product_id做比较对象，这里为什么要用子查询呢当然是为了防止数据的改变影响常数值，修改工作就会没完没了，此处希望大家能够编写那些易于维护的代码，NOT不再赘述，反正IN的重点就是使用子查询作为参数</li>
+
+
+<li><p><b>EXISTS谓词</b></p>为什么放到最后介绍因为这是比较难得一块知识点。比较难的原因有三，1EXISTS与之前使用的谓词方式不同2语法理解起来有困难3实际上可以使用IN 与NOT IN来替代掉EXISTS的场景。实际上作为一个中级以上的DBA，EXISTS是必须要会的而且会省却很多麻烦。一言蔽之谓词的作用就是判断存在某条记录的的存在与否并返回真值。在EXISTS中经常使用关联自插叙
+例如如下，SELECT product_name,sale_price FROM Product AS p1 WHERE EXISTS(SELECT  *FROM ShopProduct AS p2 WHERE shop_id='value' AND p1.product_id=p2.product_id);这句话的意思是找出大阪店所有商品的名称与售价，为什么使用*因为在EXISTS中仅仅只判断WHERE条件的存在与否，而搜索的并不影响EXISTS的结果。当然在某些存在IN能够完成的任务没有必要硬是用EXISTS即使EXISTS有其便利性质，
+关于NOT EXISTS 其实有一块更大难牛逼的叫做关系运算的除法是非常非常大的应用场景我们在第7章讲述。这里发个小牢骚虽然说是SQL基础教程，但是索引存储过程等等东西好像没覆盖到。</li>
+
+</ol></li>
+
+<li><p><b>CASE表达式</b></p>CASE通常在区分情况的时候使用。可以简单分为两种情况简单CASE，搜索CASE，搜索CASE实际包含简单CASE表达式的全部功能，虽然句子中的ELSE可以省略，但是在使用中还是希望不要省略如同DEFAULT一样，END不能省略，CASE表达式能够与SELECT的结果进行组合，DBMS中持有不同名称的CASE例如ORACLE的DECODE。
+CASE表达式属于函数的一种，搜索CASE 的语法如下 CASE WHEN <求值表达式> THEN <表达式> WHEN <求值表达式> THEN <表达式> WHEN <求值表达式> THEN <表达式>...ELSE <表达式> END，从语法我们看出其返回表达式，当然表达式也是一个值了，这种FP与OO之争直接讲了，当执行到WHEN中求值表达式，如果为真则返回表达式1，如果不为真则执行下一个WHEN，当所有WHEN都不为真则返回ELSE的表达式，表达式=值 值=表达式，然后end出去。
+关于CASE的使用我们组合SELECT子句的列来做例子，SELECT product_name CASE WHEN product_type='衣服' THEN 'A:'||product_name WHEN product_type='办公用品' THEN 'B:'||product_name WHEN product_type='厨房用品' THEN 'C:'||product_name ELSE NULL END AS abc FROM Product；最容易犯的错误就是忘记了END，case最方便的一点是它是一个表达式，
+在于它可以被书写在任意一个位置，也可以作为GROUP BY的另一种写法 行列互换，具体例子不再列出就是原本几行如今几个CASE，唯一不方便的地方就是需要提前知道有几个CASE条件WHEN，下面来介绍简单CASE表达式，与switch的方式类似，而搜索型则与if else相似，简单型的语法如下 CASE <表达式>
+WHEN <表达式> THEN <表达式> WHEN <表达式> THEN <表达式> WHEN <表达式> THEN <表达式>... ELSE <表达式> END，最初的CASE <表达式>也会作为求值的对象，虽然在P219看上去简便了很多，但是失去了灵活性，只·当需要在WHEN子句指定不同列的参数的时候就做不好了。ORACLE和MYSQL在220页再次不再赘述它们的奇特用法。
+其实学到这里我就想问加入某些ORM框架不提供原始SQL的书写，这些SQL岂不是完全就是DBA负责了咯，恩能够加一层翻译为原始SQL的全功能ORM框架好像挺有意思的啊。</li>
 </ol>
 </p>
 
@@ -741,9 +766,35 @@ EXTRACT(SECOND FROM CURRENT_TIMESTAMP)AS second;而在SQL Server中则换用DATE
 <p>集合运算，联结。并查集的算法</p>
 <p>
 <ol>
-<li><p><b>集合运算</b></p></li>
+<li><p><b>集合运算 行记录的运算</b></p>集合运算就是对满足同意格式记录做加减乘除四则运算，集合在数学中表示各种各样事物的总合，在数据库领域则表示记录的集合.<ol>
 
-<li><p><b>联结</b></p></li>
+<li><p><b>表的加法集合并集UNION</b></p>对两张1-8 123910 代表记录product_id列，当使用并集的时候结果是1-10，UNION自动去掉重复的记录，如果使用UNION ALL则表示加上所有的新记录，此时不再去重复1-8 345 910这样，一下介绍语法以及注意点
+SELECT colums1，column2 from Product p1 UNION SELECT column1，column2 FROM Product2 p2此处注意所有的列的类型要相同且列的数目相同，AS在集合运算中有别的用处此处省略AS，除了ORDER BY只能在最后使用一次之外其他并不限制包括ORDER BY与HAVING，这是因为做排序对集合的加法没有什么用，集合运算应该是从左到右顺序的同级情况下不存在乘法除法先，事实上这里的乘除比较微妙</li>
+
+<li><p><b>选取表的公共部分交集INTERSECT</b></p>具体用法 SELECT colums1，column2 from Product INTERSECT SELECT column1， cloumn2 FROM Product2 p2查找公共记录 INTERSECT ALL也存在用法不赘述。345</li>
+
+<li><p><b>记录的减法EXCEPT</b></p>具体用法 SELECT colums1，column2 from Product EXPECT SELECT column1， cloumn2 FROM Product2 p2;值得质疑的是加减双方的顺序会影响最终的结果 p1-p2 12678 p2-p1 910</li>
+
+<li><p><b>关系除法关系乘法放到下次</b></p></li>
+
+</ol></li>
+
+<li><p><b>联结</b></p>以列为单位对表进行连接JOIN 从其他表把列添加进来的集合运算，大致分为内联结外联结，且注意以前过时的联结语法不要再使用。<ol>
+
+<li><p><b>什么是联结JOIN</b></p>简单来讲就是将其他表的列添加过来，联结不仅仅双表也可以多表。</li>
+
+<li><p><b>内联结 INNER JOIN</b></p>这是应用最广泛的联结运算。简单来讲就是a:两种表都包含的相同列.b:两张表的唯一列.就是通过a作为桥梁然后把需要联结的b们联结起来，话不多说直接进入实践环节，我们要联结Product与ShopProduct这两种表，具体在书本的P236也给出结构以及数据，两表的相同点桥梁是商品编号，
+我们的任务则是把商店表的店id，店名称与商品表的商品id，商品名称，商品售价联结在一起。SELECT sp.shop_id,sp.shop_name,p.product_id,p.product_name,p.sale_price FROM ShopProdcut AS sp INNER JOIN Product AS p ON sp.product_id=p.product_id;建议在使用内连接的时候使用别名且列名最好以别名.列名这样的形式
+来表现，这样直观不容易出错可读性比较好。内联结的要点就是FROM子句要会写，ON是个必要条件不能够省略且卸载FROM与WHERE之间。后面可以跟where等等其他子句，当然联结写起来比较复杂而且很多情况都是不只2张表的联结，所以写成视图的方式是比较合适的。</li>
+
+<li><p><b>外联结 OUTER JOIN</b></p>直接上例子 SELECT sp.shop_id,sp.shop_name,p.product_id,p.product_name,p.sale_price FROM ShopProdcut AS sp RIGHT OUTRT JOIN Product AS p ON sp.product_id=p.product_id;这句SQL乍看跟前面的内联结很像但是外联结与内联结之间是有区别的，外联结会选出所有的信息包括NULL，在书本241页有写，
+内联结的表记录数目是不确定的而外联结的表记录数目是固定在，在实际使用中外联结有这个优势所在，外联结包含左右RIGHT LEFT代表以谁为主表的意思，最终结果就是包含主表的全部数据，当然改成LEFT上述的结果也相同，实际中使用RIGHT比较多一点其实都一样。那么3张表以上的联结要怎么做呢，（（12）3）类似是这样的。我这边也给出一个SQL语句
+SELECT sp.shop_id,sp.shop_name,p.product_id,p.product_name,p.sale_price,ip.wer,ip.sdf FROM ShopProdcut AS sp INNER JOIN Product AS p ON sp.product_id=p.product_id INNER JOIN InventP AS ip ON sp.product_id=ip.product_id WHERE xxx;不在乎顺序关键点是下一个联结要接在前一个联结的ON语句背后且ON不能够缺少</li>
+
+<li><p><b>关系乘法除法 CROSS JOIN交叉联结 过时语法</b></p>过时语法在p250此处不赘述。因为表记录数量=表1记录数目×表2记录数目所以这种笛卡尔积叫做关系乘法一般没什么卵用而且耗费资源很大，关系除法是重点中的重点，学会简直就是质的提升，我感觉用的地方很多，看了很久都没有学会。从现象到现象还是到理论再到现象，杨振宁的国科大演讲两种推演。下面介绍除法以及我自己悟的不相干法。
+P253 唉夜深了，不说多了我悟了 简单讲就是除数-被塞选的列作为关联子查询插入到NOT EXISTS加入被除数的塞选结果包含除数 则NOT EXISTS会返回TRUE最后在SELECT DISTINCT去掉多余值就好了，而且当把EXCEPT换成INTERSECT的时候则会挑选所有不相干的列，比如我查所有满足unix oracle java的工程师则满足除法，
+比如我查所有未患感冒，志气管炎，咳嗽，鼻涕等等的列则可以用不相干法。</li>
+</ol></li>
 
 </ol>
 </p>
