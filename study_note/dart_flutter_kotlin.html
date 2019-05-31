@@ -42,6 +42,7 @@
         <div class="inner">
             <h2>势不可挡的flutter以及kotlin</h2>
             <h3>注 此文来自对<a href="https://book.flutterchina.club/">flutter基础</a>的读书笔记 作者wendux在掘金上有专栏，深入浅出，看得出作者涉猎比较广</h3>
+            <p>光dart+flutter就够呛了 kotlin那么就另外选一份吧</p>
             <p>我当初选这个标题来干的，的确非常的正确这么几个东西加载的一起的技术组合是目前android以及移动开发所需要的。这个任务我有增加我的优先级别。定为最高级。目前我的任务list里面有
 netty spring boot pg 以及kotlin+flutter套餐这个第一优先级</p>
             <p>不大熟悉函数是以及js的东西，但是用过。但是看了dart的好处以及佩服与wendux这位作者广度2两级深度两级 大于我的11，所以我认为dart未来大有可为，在服务端或许会替代java，需要更多生态框架库的支持，编程语言的生态就是这些，
@@ -78,9 +79,50 @@ netty spring boot pg 以及kotlin+flutter套餐这个第一优先级</p>
             <p>
             <ul><b><p>第一章缘起 起步 第一个flutter应用</p></b>
             <li>缘起:</li>
-            <li>起步之移动开发技术简介</li>
-            <li>起步之flutter</li>
-            <li>起步之flutter开发环境及配置</li>
+            <li>起步之移动开发技术简介 <ul>
+                <li>移动开发之原生开发，就是指使用操作系统所提供的那一系列sdk来开发app，其优点就是性能好，还能够调用到相机gps蓝牙等等，(跨平台与动态化)其缺点就是无法动态化发版麻烦以及人力成本需要分好几个ui端。
+                针对这两个问题，有了以下3个解决方式。1 hybrid 混合开发(H5+原生 微信小程序)但是并非原生渲染 以webApp的形式封装成app，在webvirw中渲染，js调用原生的方式（js+原生 weex rn 快程序），跨平台ui框架的方式(QT Flutter)</li>
+                <li>先来讲讲 h5原生混合开发吧，这玩意我在17年接触过都是泪不说了当初还是前端的好时候说不定学vue还是大有前途的呢，基本就是开发一个html文件塞入webview中渲染，这里涉及一个问题，怎么用js调原生，这里
+                有几个框架dsbridge 这种建立起js语法调用指定原生语法的桥梁框架。
+                <code style="background:aliceblue">js对应的原生api<br>
+                    class JSAPI { <br>
+                    @JavascriptInterface<br>
+                    public Object getPhoneModel(Object msg) {<br>
+                    return Build.MODEL;<br>
+                </code>
+
+                    <code style="background:aliceblue">原生api注入webview<br>
+                        //DWebView继承自WebView，由dsBridge提供<br>
+                        DWebView dwebView = (DWebView) findViewById(R.id.dwebview);<br>
+                        dwebView.addJavascriptObject(new JsAPI(), null);<br>
+                    </code>
+
+                    <code style="background:aliceblue">
+                        var dsBridge = require("dsbridge")<br>
+                        //直接调用原生API `getPhoneModel`<br>
+                        var model = dsBridge.call("getPhoneModel");<br>
+                        //打印机型<br>
+                        console.log(model);<br>
+
+                    </code>
+
+                    总结对H5的混合开发 技术栈其实是web栈，但是性能不好以及无法完成原生所要调用的一些功能，这个技术基本属于外包技术一级，对技术产品没要求的公司考虑
+                </li>
+                <li>react native这类原生开发 有js调用底层原生控件渲染，相当于用web开发的方式开发移动端，移动工程师的饭碗被web端抢了。先来了解rn 与react相同 flutter也是借助于部分的思想来做开发。
+                先来了解两个概念 dom树与响应式。dom树也就是标记语言的树状结构，也就是控件树。dom操作之类不再赘述，响应式编程就是空间状态变化则ui立马跟着变化，这里的状态就是空间对象的一些属性，其原理
+                主要是状态变化带动ui，react根据状态变化重构ui树，react根据diff算法来比较虚拟dom树与dom树，每次状态变化更改的是抽象层的虚拟dom而批处理到真实dom，这样有助于提高性能避免过渲染产生的性能影响。
+                react的虚拟dom映射js中的dom而rn中的虚拟dom映射原生中的空间树使用jscore，jscore是js的解释器为js提供运行环境以及映射控件树，布局传递消息给原生，原生根据消息来渲染空间树，性能好且跨平台。
+                weex是阿里巴巴抄rn的其中有些不同的语法，rn 依靠rax jsx，只支持jsx语法而weex支持rax 与vue语法。快应用是国内手机厂商应用商店狙击微信小程序搞得一种标准，快应用不支持react等框架语法使用原生js开发，但是目前好像支持了
+                mpvue，其不包含框架打包的时候不需要框架所以体积比较小能够快速发包。热更新跨平台便宜高效率资源社区丰富缺点是手势冲突，需要JIT执行与aot的语言比性能差一些</li>
+                <li>跨平台ui框架QT Flutter，性能高 灵活一套组件库走天下，缺点没办法 jit以及热更新。先驱烈士QT。好了终于介绍Flutter也是自绘UI加原生，使用dart语言，热重载编译快社区资源开始丰富，google亲儿子。</li>
+            </ul></li>
+            <li>起步之flutter，既支持jit能够与js比动态化，又支持AOT编译速度快js拍马赶不上，热重载时用jit，编译应用第一次则用AOT，所谓jit大概就是一句一句解释，所谓aot则是一次性编译完。将之编译成机器码效率最好，有人
+            会讲java是编译成字节码再编译成目标码的其实这不影响区别，我们要得其神去其形，凡是执行代码之前需要编译的则是AOT提前编译静态编译，而不需要编译需要解释的则是jit即使编译动态编译。优点有
+            类型安全是个强类型语言虽然支持var，2性能好AOT发布包3开发效率高支持JIT热重载，4内存分配好Flutter的团队成员多来自Chorme v8以及5dart团队就在你身边这是一个火热的项目，刚刚把二进制原型链包开发完毕。
+            Flutter架构：所谓无论学什么都要在心里有一份地图可以按图索骥有所寻路，而框架图则是这么一份为我们理清其内在的关键指示。分为engine(C++)与framework (dart)两层.
+            framework 分好几层主要分底层ui，布局，组件三层，分别底层暴露给第二层动画 ui  绘制 手势的能力，第二层也就是ui树层类似虚拟dom，第三层是空间层widget，我们主要接触第三层的两层 widget medesign 手势层
+                <a href="https://book.flutterchina.club/chapter1/flutter_intro.html">框架图</a>engine层呢，则是dart语言层 skia c++ui绘制层 以及text字排版层。学习flutter还需要多结合实例gallery和社区资源</li>
+            <li>起步之flutter开发环境及配置 这里不再介绍都是小儿科问题 等到ios需要则再介绍</li>
             <li>起步之Dart语言简介</li>
 
 
