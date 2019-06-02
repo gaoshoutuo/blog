@@ -124,10 +124,181 @@ netty spring boot pg 以及kotlin+flutter套餐这个第一优先级</p>
                 <a href="https://book.flutterchina.club/chapter1/flutter_intro.html">框架图</a>engine层呢，则是dart语言层 skia c++ui绘制层 以及text字排版层。学习flutter还需要多结合实例gallery和社区资源</li>
             <li>起步之flutter开发环境及配置 这里不再介绍都是小儿科问题 等到ios需要则再介绍</li>
             <li>起步之Dart语言简介  接下来介绍Dart语言的背景与语法特点，我认为Dart语言结合了函数式的语法以及类型系统的好处，是typejs基础上的Java虽然说是脚本语言，但是在大型工程面前应该还是有很可以开拓与做的。其实说话要精准准确避免说这些车轱辘话。努力 奴隶 放弃
-            <code>
+            dart是对标java具备js动态化能力的一种完备语言，在变量的声明方面，dart支持var与object dynamic const final<code>
+            var a=123;a='123'; 则为waring 因为var的类型再一次接受变量被固定<br>
+                    object b=123;<br>
+                    dynamic c=123;<br>
+                    b='123';c='123';<br>
+                    print(b.length());//waring 虽然可以被改变类型 但是不提供哦你除了object的方法之外的方法<br>
+                    print(c.length()); 提供object方法之外的方法 应该是派生底部 我猜的<br>
+                    const str1='123';编译常量<br>
+                    final str2='234'对象常量 指针不可更改<br>
+            </code>对于函数 则有以下六项特点，注意dart是函数式语言所以函数可以被当成参数传递，以及被当作变量传递。
+                <code>
+                    1 函数声明<br>
+                    bool _isright(){print('hello world!!');也不知道是谁规定的这里_经常作为自己命名的参数以及对象的首个符号<br>
+                    }<br>
+                    2.未设置返回值类型的类型自动设置为 dynamic <br>
+                    typedef bool callback()<br>
+                    isChange(var callback){<br>
+                    print(callback());<br>
+                    }<br>
+                    void isR(callback c){<br>
+                    return c;<br>
+                    } 这个代码有点别扭了 虽然生命了callback类型但是 callback没实现过<br>
+                    isR(isChange('abc'));错误的因为isChange必须是bool类型<br>
+                    对于只包含一句函数体的函数可以用lambda表达式 ()->{}<br>
+                    bool abc(var cfd)=>{print(cfd);}<br>
+
+                    3.函数作为变量<br>
+                    var e=(str){<br>
+                        print(str);<br>
+                    };<br>
+                    e('123');<br>
+                    4函数作为参数<br>
 
 
-            </code>
+                    void reset(var callback){<br>
+                        callback();<br>
+                    }注意 此处不是把callback的值进行传递 而是整体进行传递 接受的是函数而不是参数 不是某个类型<br>
+                    reset(()=>{print(hello world)});<br>
+                    5.不定位置 中括号括起来<br>
+                    int abc({int a，int b,[string c]){<br>
+                    if(c!=null){<br>
+                    return a+b;<br>
+                    }return a;<br>
+                    abc(1,2,'a');<br>
+                    abc(1,2);<br>
+
+                    6不定名称 大括号括起来 <br>
+                    int qmc({int height,int weight}){<br>
+                    if(height==0)return 0;<br>
+                    return weight/height;<br>
+                    }<br>
+                    qmc(height:183,weight:70);可选命名参数在dart中非常的普遍，这个在idea这个ide里面也有对函数的标注，也是网页的通用方式，是一种比较好的提示参数的方式。<br>
+
+                </code>此外还对异步做了语法以及api的特殊优化Future以及stream流非i/o流，防止回调地狱，这些异步函数我理解为就是不同步函数，不如delay函数会在执行函数执行，设置一些
+                耗时的操作，耗时操作结束才会返回，而不是等到函数结束，例如延时2s，io 1s就完成了 也是延时2s后返回io的结果 这点似乎还不如 while 的thread sleep。本身是单线程的，我感觉这样非常耗费性能。
+                我不知道跑，我这边理解错误没有，但是我觉得这种延时的尺度怎么把握，又是单线程，Async/await 这点做的与js的相同。js中的异步函数这么不精准的吗，而且得是专门开辟一个时间片给这个函数执行越想越觉得简单但是低效
+                nodejs这种东西的百万并非难道是吹牛皮的
+                <code>
+                    1.Future Future函数返回所有的对象都是Future 则方便链式操作<br>
+                    Future.delayed(new Duration(seconds: 2),(){<br>
+                    //return "hi world!";<br>
+                    throw AssertionError("Error");<br>
+                    }).then((data){我们在then中接受前一步的异步结果<br>
+                    //执行成功会走到这里<br>
+                    print(data);<br>
+                    }).catchError((e){<br>
+                    //执行失败会走到这里<br>
+                    print(e);<br>
+                    }).whenComplete((){<br>
+                    //无论成功或失败都会走到这里 类似finally 并且在return 之前<br>
+                    });<br>
+
+                    2.Future.wait 应对多延时<br>
+                    Future.wait(<br>
+                    [<br>
+                    Future.delayed(new Duration(seconds: 2),(){<br>
+                    return '123';<br>
+                    } ),<br>
+                    Future.delayed( Future.delayed(new Duration(seconds: 2),(){<br>
+                    return '456';<br>
+                    } ),<br>
+                    ] ).then((result){<br>
+                    print(result[0]+result[1])})catchError((e){<br>
+                    print(e);<br>
+                    });<br>
+
+                    3.应对回调地狱 es6出现的promise就是Futyre 而es7出现的 async/await<br>
+                    例如我们有三个异步函数<br>
+                    //先分别定义各个异步任务<br>
+                    Future< String> login(String userName, String pwd){<br>
+                    ...
+                    //用户登录<br>
+                    };<br>
+                    Future< String> getUserInfo(String id){<br>
+                        ...
+                        //获取用户信息<br>
+                        };<br>
+                        Future saveUserInfo(String userInfo){<br>
+                        ...
+                        // 保存用户信息<br>
+                        };
+                    <br>
+                    login("alice","******").then((id){<br>
+                    //登录成功后通过，id获取用户信息<br>
+                    getUserInfo(id).then((userInfo){<br>
+                    //获取用户信息后保存<br>
+                    saveUserInfo(userInfo).then((){<br>
+                    //保存用户信息，接下来执行其它操作<br>
+                    ...<br>
+                    });<br>
+                    });<br>
+                    })<br>
+                    这样就出现了回调地狱，我们用Future与await/async去解决
+
+                    login("alice","******").then((id){<br>
+                    return getUserInfo(id);<br>
+                    }).then((userInfo){<br>
+                    return saveUserInfo(userInfo);<br>
+                    }).then((e){<br>
+                    //执行接下来的操作<br>
+                    }).catchError((e){<br>
+                    //错误处理<br>
+                    print(e);<br>
+                    });就是then的链式调用<br>
+
+                    await/asysc方式解决<br>
+
+                    task() async {<br>
+                    try{<br>
+                    String id = await login("alice","******");<br>
+                    String userInfo = await getUserInfo(id);<br>
+                    await saveUserInfo(userInfo);<br>
+                    //执行接下来的操作<br>
+                    } catch(e){<br>
+                    //错误处理<br>
+                    print(e);<br>
+                    }<br>
+                    }<br>
+                    <br> async出现在所有方法体的，await出现在Futrure这个异步函数的前面且在async的内部，await表示在结束之后才执行下一步，恩我这就明白了原来前面的限制耗时操作应该只是指delay的
+                    <br>  而这里的异步就是没有废耗时间的异步，并且这只是与发扬最终还是会被解释成promise的格式去运行。
+                    <br>
+                    <br>  Stream 也是用于接收异步事件数据，和Future 不同的是，它可以接收多个异步操作的结果（成功或失败）。 也就是说，在执行异步任务时，
+                    <br>  可以通过多次触发成功或失败事件来传递结果数据或错误异常。 Stream 常用于会多次读取数据的异步任务场景，如网络内容下载、文件读写等。举个例子：
+
+                    <br>  Stream.fromFutures([
+                    <br>    // 1秒后返回结果
+                    <br>    Future.delayed(new Duration(seconds: 1), () {
+                    <br>   return "hello 1";
+                    <br>     }),
+                    <br>    // 抛出一个异常
+                    <br>      Future.delayed(new Duration(seconds: 2),(){
+                    <br>      throw AssertionError("Error");
+                    <br>      }),
+                    <br>      // 3秒后返回结果
+                    <br>      Future.delayed(new Duration(seconds: 3), () {
+                    <br>       return "hello 3";
+                    <br>        })
+                    <br>        ]).listen((data){
+                    <br>         print(data);
+                    <br>        }, onError: (e){
+                    <br>        print(e.message);
+                    <br>       },onDone: (){
+
+                    <br>      });
+
+                </code>
+                对比java与dart
+                dart的vm已经正在优化，对比jsv8 jvm go(只有Gc没有vm)，比java更有变现力对函数式语法支持比较的多，flutter正在火热生态只是时间的问题。我在微博上也看到下一代
+                移动操作系统fushons，被吹的太过了，但是物联网好像未来会使用这个应为vm比较小。
+
+                对比js与dart
+                dart几乎抛弃了所有的动态化类型语言的特点，不支持反射以及动态创建函数等等，但是其静态化语言可用于静态分析以及扎实的类型系统减少bug的出现概率。动态化是一把双刃剑，很多人
+                不喜欢看别人js代码就是不喜欢别人的动态化。dart类似于拥有类型的js typescrip coffeescriart既能进行服务端脚本、APP开发、web开发，这就有优势了！这是一门全栈语言
+                作者是非常看好dart语言的发展的 我也是其实我也没搞懂Go python是怎么活起来的大概是java太没用了，一般说一门语言没用的人多半是自己才。
+                恩 我希望我在PL语言上面下苦功夫这些我都要懂会好
 
             </li>
 
