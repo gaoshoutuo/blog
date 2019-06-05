@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+    <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+    <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+    <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+    <title>零基础入门大数据</title>
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-45586344-1', 'yinwang.org');
+        ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+<script>
+    if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+    {
+        document.body.classList.add('mobile');
+    }
+</script>
+
+<!--
+<div class="ad-banner" style="margin-bottom: 5px">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle"
+            style="display:inline-block;width:100%;height:90px"
+            data-ad-client="ca-pub-1331524016319584"
+            data-ad-slot="6657867155"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+-->
+
+<div class="inner">
+    <h2>大数据</h2>
+    <p>我对大数据很有疑惑，到头来应该是java+hadoop家族，这是开发工程师，至于其他软技能得再加入</p>
+    <p>第一章 大数据的前生今世 hadoop以及大数据的背景，作者告诉我们学一门新技术不要一开始就钻入道细节当中去，而是要看其发展历程，这点我在数学物理哲学经济学都有想法，但是貌似哲学史就是哲学入门的
+    最好路径。好了言归正传。最近老是容易困尤其是中午得克制克制，今天看b站程序员汪深感我菜逼的很。作者叫我们要牢牢把握时代的脉络，做时代的弄潮儿在大数据的浪潮中就是现在要做更多的事情，
+    而不是等到大数据过去了，才追逐浪潮只会留下遗憾与迷茫。大数据是google的3篇论文也就是大数据3架马车，bigtable，maoreduce，hdfs，一个文件系统，一个数据库系统，一个计算框架，在那个仍然在追逐单击性能突破的
+    年代，想想谷歌的最广为人知的业务就是搜索引擎，在数学之美里面提到。搜索引擎就是分布式爬虫一直抓取网页数据，并且对结果做哈希存储，谷歌横空出世的三篇论文给了 doug这个程序员很多的灵感于是他花两年时间构建hadoop从nutch中剥离出，这个doug不是给java很多变化的 doug lea而是doug cutting，包含hdfs mapreduce。
+    后来hadoop有cloudora托管，雅虎在08年的时候开始研究使用hadoop并且添加一个新生态pig，因为mapreduce的编程是在太不好写了，于是得依靠pig这个脚本语言来描述自己的maoreduce计算需求，并且由pig
+    来最终编译成为mapreduce的代码，yahoo最成功的投资是阿里巴巴，在搜索引擎与谷歌的竞争中落败之后就没有声音了，但是pulsar这个东西有让我了解到其似乎并不是没有实力与底蕴的公司，只不过对手是谷歌而已。
+    之后facebook便在hadoop的基础开源了hive数据仓库，hive能够帮助数据库工程师，使用sql来对hdfs中做数据分析，你看技术的发展总是这么先主干其次完善以至于有了生态，这就是开源与软件魅力无穷的地方。
+    linux与windows的出现比较相近，java的各种mvc框架也几乎在同一个时期出的，这就是事物的发展规律，一只要有明晰的路线与思想方法立马就会百花齐放，生态补齐。
+    其后各种hadoop生态层出不穷，后来伯克利的amp实验室在使用hadoop集群mapreduce处理机器学习的时候发现由于机器学习是多次迭代计算，而mapreduce总是会重启重新执行，于是，设计
+    了新的计算框架spark，maoreduce可不只是计算当然也掌控了所有集群的资源调度分配，于是yarn的出现代替了mapreduce的资源管理作用，mapreduce是在硅谷被淘汰了。
+    上述的mapreduce与spark等等都是批处理，又被称为离线计算，因为计算以天为单位，在storm与flink等等新的计算引擎则是属于流计算也就是实时计算，当然flink是批流融合的引擎，
+    我们把存量数据交给spark 等等去处理把增量的数据交给刘计算引擎去处理，2011年的时候hbase一直nosql出现了，当然还有很多cassandra，大数据的主要三个使用场景是，数据分析，数据挖掘，机器学习。
+    所以虽与不同的场景都有不同的工具，例如数据分析则有spark sql 等等sql引擎去完成，这里记住所谓的数据分析就是在sql上面做文章。数据挖掘以及机器学习在tf mahout mllib等等，内置机器学习以及数据挖掘的算法。
+    容易看到的是一个一般的机器学习企业应用平台的架构基本底层是 hdfs大数据层出 第二层是mapreduce sprak 批处理 storm flink spark streaminmg流处理 以及hive hbase 等等nosql系统，第三层是数据分析，数据挖掘机器学习接口，顶层则是我们的大数据集成系统。有点像，
+    海康把mysql集成进去一样</p>
+
+</div>
+</body>
+
+</html>
