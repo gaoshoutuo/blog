@@ -1,0 +1,80 @@
+﻿<html lang="en">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=0.5">
+
+        <link href="http://www.yinwang.org/main.css" rel="stylesheet" type="text/css">
+        <link rel="alternate" type="application/atom+xml" href="/atom.xml" title="Atom feed">
+        <link rel="shortcut icon" href="http://www.yinwang.org/images/Yc.jpg">
+
+        <title>自律</title>
+
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', 'UA-45586344-1', 'yinwang.org');
+            ga('send', 'pageview');
+        </script>
+    </head>
+
+    <body>
+        <script>
+            if (/mobile/i.test(navigator.userAgent) || /android/i.test(navigator.userAgent))
+            {
+               document.body.classList.add('mobile');
+            }
+        </script>
+
+        <!--
+        <div class="ad-banner" style="margin-bottom: 5px">
+            <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+            <ins class="adsbygoogle"
+                    style="display:inline-block;width:100%;height:90px"
+                    data-ad-client="ca-pub-1331524016319584"
+                    data-ad-slot="6657867155"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+        -->
+
+        <div class="inner">
+            <h2>北大区块链课程的笔记</h2>
+           <p> 2020.11.11     做事情就应该要义无反顾的。大城市的人的特质比小城市可厉害太多了。</p>
+            <p>2.比特币中的密码学
+            <span>密码学有两条性质 哈希与签名，其中哈希的两条性质哈希膨胀 与 hidding  比特币中要多一条性质那就是puzzle friendly。
+            先解释 哈希膨胀  对于x H(X)就是他的哈希值，密码学中也称digest 摘要。对于要求的X空间，存在有2^x
+                个哈希值的取值范围，其中可能存在x!=y 但是HX=HY的情况这就是我们所说的哈希碰撞，此外我们还要就
+                X的取值范围要比较连续平滑，HX也是，不能集中在某一些范围。x的取值空间要足够的大，用来防止以遍历
+                的手段撞上同一个hash 然后得到x。为了得到一个比较正规的X范围 在比特币中。通常是 H_HEADER+NONCE.也就是
+                X后跟一个随机数来保证X'的符合标准。第二层hidding的意思就是在HX的值可以公布，但是X的值不去公布，很难通过
+                HX的值去计算X。MD5就是一种被我国王小云教授破解的失败的HASH函数。而比特币所要求的puzzle friendly 就是
+                对于挖矿 HX要在某一个范围 例如在HX 在256位 前顶K位数的0的hash范围，挖矿就是在求这个nonce，但是nonce总是
+                随机的，如今并没有好的办法去找到好的nonce直接破解难度，唯一就是硬用算力去算，谁算力大，谁越可能找到nonce，然后
+                找到区块链获得铸币权。这也叫做工作量证明。比特币中使用sha-256hash算法，sercure hash algorithm
+            </span>
+                <span>比特币中的签名性质，每个人都有地址，需要用公钥私钥这对密钥，非对称加密体系弄得。对称加密是加密解密
+                    用的都是同一把钥匙，密钥需要传输，密钥丢失就麻烦了。所以需要有一对密钥。也就是公钥传送给其他接受方，而
+                    私钥自己保存，公钥用来加密信息，私钥用来解密信息。另外摘要为了防止篡改，需要自己的私钥用来生成摘要签名，
+                    公钥验证签名，是否是本人，。
+
+                    假如两个人生成的公私钥生成 相等一个人把另一个人账户的钱取走。这种情况存在但是几乎不可能，还是看密钥对生成算法
+                    的。imtoken杭州就不知道被套话了还是怎么的，有一个人声称，自己用hasj碰撞撞到一个10w美元代币的账户。imtoken都把算法出处说了。
+                    比特币要求的签名算法不仅生成密钥对的时候需要好的空间范围随机性，而且在签名的时候也需要好的随机源，不然容易泄露私钥。
+                    诶菜才回三门牛早去杭州了
+                </span>
+
+            </p>
+            <p>3 比特币中的数据结构
+            <span>
+                区块链也就是由一个个区块组成的链表。想象一个创世区块被第二个指着，第三个指着，然后继续，后一个区块存储前一个
+                区块的HX，防止篡改。篡改传递。只要记住最后端的一个HX或者记住中间随便一个都可以去验证前面的区块。牵一发动全身。
+                减少存储空间只需要记录几千个最近区块。去中心化的防止恶意节点。
+            </span>
+            </p>
+
+        </div>
+    </body>
+
+</html>
