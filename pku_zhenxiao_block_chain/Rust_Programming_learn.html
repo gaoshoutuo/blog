@@ -153,14 +153,223 @@ ALI, MEHRAN、ANUPHANVITTAYAKULWEERAYA、CHTAEVA, POLINA、HUSSAIN, SADAM、KHAN
             </p>
 
             <p>4.OwnerShip
-                <span>
+                <span>所有权是rust中比较独特的概念，其他语言里面没有我们要好好的去了解了解。
+                    所有权的存在就是为了管理堆数据，堆内存数据。
+                    一般语言根据内存的管理分配有三种1，像c/c++那样 使用之前先alloc申请内存，使用完成之后delete，主动申请内存主动释放内存，避免死指针与
+                    野指针，防止内存泄漏，2.第二种就是Java这种GC语言，通过垃圾回收来减轻程序员的脑力负担，不需要多考虑内存分配管理，应用为零的对线都被回收。
+                    3.第三种就是rust的这种所有权机制了，每个变量只能在其作用域范围内有效，且变量只能被一直指针所持有。
+                    比如 let x=5 let y=x  ----与  let mut str1=String::from("hello");  str1.push_str(",World"); let s1=String::from("hello"); let s2=s1;
+                    在第一段语言 我们的整型 字符 浮点 bool这些是可copy的，是直接放在栈上的常量不需要在堆上申请内存，后者字符串就是需要在堆上申请内存，在第三段这句话里面，
+                    s1被s2 取代 该堆内存仅仅只可以被s2持有所有权，这里可能涉及深度浅度拷贝的问题，但是rust里面并没有这种，rust里面也有深拷贝，就是clone，浅拷贝不允许两个指针指向
+                    一个变量，这样可以防止在多个指向同一个变量的指针离开作用域，该堆内存被释放多次出现错误。另外返回值是可以把所有权给传递回来   return S1;并且可以建立元组来传递多个所有权
+                    变量，但是这种每次都传递所有权的变量似乎又有一些形式主义上的多余，于是我们在4.2上引入引用概念，主要传递值的引用。值的所有权，引用的所有权。有点意思。
 
+                    fn calculate_length(s: String) -> (String, usize) {
+                      let length = s.len(); // len() 返回字符串的长度
+                    (s, length)
+                    }
+                    s传入 必须将s返回不然 出了方法体就被回收了
+
+                    比如int bbq=10; int *p=-&-bbq;
+    ·               cout<<*p<<-e-ndl-; 输出bbq的值，就是解引用操作。
+                    4.2引用与借用
+                    let s1=String::from("hello");
+                    let len1=genLen(&s1);
+                    void getLen(s1:&String)->i32{
+                        s1.len();
+                    }
+                    传引用 与解应用
+
+                    借用指的就是借其引用而不是占据其所有值，所以不需要还值。 &s1 指向s1的值
+                    并且借用是只读并不能够去修改该值
+                    例如如下的程序
+
+                    let s1=String:from("hello");
+                    addStr(&s1);
+                    void addStr(s1:&String){
+                    s.push_str(",World!");
+                    }
+                    这个程序是行不通的，但是 let mut 之后就是可变的了，这似乎是一种变化的办法。
+                    这就是可变引用 &mux String
+                    不可变引用允许存在多个因为他们之间互不构成竞争状态。
+                    let r1 = &-s; // 没问题
+let r2 = &-s; // 没问题
+let r3 = &mut s; // 大问题
+                    允许同时拥有不可变引用 但是不能够同时拥有可变引用
+                   不可变引用不希望可变引用来改变值，导致它的尴尬。这就是不能够同时存在的原因。
+                    但是引用是使用一次即失效的，所以上面的语句改为
+                    let r1=&-s;
+                    let r2=&-s;
+                    println({}{}r1 r2)
+                    let mut r3=&-3;这条语句就能用了 因为上面已经使用掉不可变引用了，当然
+                  这些做法都在编译初期避免的错误，但是我觉得这种对象值竞争问题我在写Java的时候一次也没碰到这种bug问题，反倒是经常
+                    烦恼根据一些参数调用方法的这种反射形式的问题。
+
+                    悬垂指针，释放内存时保留的野指针
+                    下面这个程序将说明问题
+                    let &s=getM();
+                    fn getM()->&String{
+                    let s1=String::from("hello");
+                    &-s
+                    }
+                    这是错误的并不会被传递出去，因为s1的生命周期仅仅只在该方法体中，离开方法体s1即被销毁，所以只能够去传值不可以传递引用。
+                    在任意给定时间，要么 只能有一个可变引用，要么 只能有多个不可变引用。
+引用必须总是有效的。
             </span>
+
+                <span>
+                    4.3 slice 名字看起来薄片 分片的意思。编程的思想
+                    一个程序 我们要获取一段字符的第一个英文单词  奇葩 这里 搞了半天就是一个mut不对 本身也不会有人去主动的mut啊，不懂这里面的深意，slice切片语法左闭右开岂不是
+                    很简单。
+                    let mut s=String::from("hello world");
+                    fn first_str(s:&String)->usize{
+                        let bytes=s.as_bytes();
+                        for(i,&item)in s.iter().enumerate(){//enumerate 这个返回 索引+字节值的元组
+                            if item==b' '{
+                        return i;
+                    }
+                    }
+                    }
+                    这种是错误的，因为不能够保证值的实时同步.当我们对 s.clear();时 上述i就不管用了
+                    我们改进这个程序 使其传回引用不要返回值，否则不绑定同步。
+
+
+                    let mut s=...;一般而言都是不可变的 不知道上面为什么弄成可变
+                    fn first_str(s:&str)->&str{
+                        let s1=s.as_bytes();
+                        for (i,&item) in s1.iter().enumerate(){
+                            if item==b' '{
+                                return &s[0..i];
+                    {
+                    }
+                    &s[..]
+                    }
+                    这样就能够保证绑定了
+                    但是这个时候 s.clear()是错误的写法 ，网站书上写的是 不可变与可变不共存,好吧 最后&s[..]所以可变与不可变不能共存，
+                    但是在这里返回的时候就不能返回&s[..] 这个已经是不可变的了，只不过slice令其可变，比较专用于字符串。
+                    为什么要等到clear才是提示不共存呢。
+
+                    &str 字符串的slice 类型
+                    btc今天又是大跌  本质上 btc也是一种内卷 技术发展停滞了 于是就开始内卷了 技术从头到尾的都是工具 并不重要 学的人多了就有问题，
+                    学技术没出路，大批制造红利廉价的工程师。btc消耗资源带来一小点东西
+                </span>
             </p>
 
-            <p>5.Reference
+            <p>5.Structure&& module Enum
                 <span>
+                    本章比较struct 与 元组之间以异同 并通过struct构造数据结构，并且与enum构成完整的类型，struct 就像对象中的数据属性。
+                    5.1 定义并实例化结构体
+                    定义
+                    Struct User{
+                    username:String,
+                    email:String,
+                    signin_count:u64,
+                    active:bool,
+                    }
+                    实例化
+                    let mut user1 = User{
+                    email: String::from("someone@example.com"),username: String::from("someusername123"),active: true,sign_in_count: 1,
+                    };
+                    //修改
+                    fn rebuild_user(username:String,email:String)->User{
+                        User{
+                    username:username,
+                    email:email,
+                    sign:1,
+                    active:true
+                    }
+                    }
+                    这样有点罗嗦，当参数名称与形参名字相同的时候，可以省略形参的指定: 直接填入参数
 
+ fn rebuild_user(username:String,email:String)->User{
+                        User{
+                    username,
+                    email,
+                    sign:1,
+                    active:true
+                    }
+                    }
+
+                    我们也可以使用省略式样的结构体更新语法 例如
+                     let mut user2 = User{
+                    email: String::from("someone@example.com"),username: String::from("someusername123"),..user1
+                    };
+
+                    元组结构体 比较简单的生产不同类型的快捷不正式方法
+                    Struct Color=(i32,i32,i32);
+                    Struct Point=(i32,i32,i32);
+
+                    let black = Color(0, 0, 0);
+                    let origin = Point(0, 0, 0);
+                    black 与 orgin 有相同的结构 但是具有不同的类型 这就是元组结构体的使用场景
+
+                    没有任何字段的结构体 () 我们将在第十章 trait中介绍这个工具
+
+                    结构体中的引用
+                    struct User {
+                    username: &str,
+                    email: &str,
+                    sign_in_count: u64,
+                    active: bool,
+                    }
+                    会报错 因为生命周期的原因 详细也要等到后面的章节
+
+                    5.2 使用结构体的实例程序
+                    构造
+                    Struct Rect{
+                    length:i32,
+                    width:i32,
+                    }
+
+                    fn area(length:i32,width:i32)->i32{
+                        return length*width;
+                    }
+                    我们可以直接代入值来计算面积 比如这样
+                    area(50,30);
+                    我们可以使用元组元组来计算面积 比如这样
+                      fn area(diamons:(i32,i32))->i32{
+                        return diamons.0*diamons.1;
+                    }
+
+                    area((50,30));
+                    但是我们想要为其添加一些意义 必然是结构体
+                    fn area(rect:&Rect))->i32{//跟前面一样 我们只想要借用对象的引用 而不是想要获取对象的所有权
+                        return rect.lenth*rect.width;
+                    }
+                    area(&rect1);print
+
+                    输出 结构体不是那么的容易我们可以用 {:?}` (or {:#?}
+                    两种方式来输出 但是还要包含注解 impl
+                    #[derive(Debug)]
+                    struct Rectangle {
+                        width: u32,
+                        height: u32,
+                    }
+
+                    fn main() {
+                        let rect1 = Rectangle { width: 30, height: 50 };
+
+                        println!("rect1 is {:?}", rect1);
+                    }
+                    {:?}`  rect1 is Rectangle { width: 30, height: 50 }
+                    {:#?}  rect1 is Rectangle {
+                    width: 30,
+                    height: 50
+                }
+                    两种风格
+
+                    rust 提供了很多 derive 的注解供我们使用 但是仔细想想是不是还有结合更加紧密的方式 使得面积只可以去计算Rect这个
+                    结构所指代的
+
+
+
+                    5.3 方法语法
+
+
+                    结构体并不是唯一一个创建自定义类型的方法，下面的枚举会增加你的工具箱。
+                    注解 枚举 这些在Java中不是很重要的东西，在这里得到一些重视与深入，仔细研究Acala与parity web3招人的要求
+                    不去练剑是错误的 江湖从未远离 需要承载更多，
+                    前端工程师 后端工程师 区块链工程师 全栈工程师  属于区块链开创新时代的美好世界，去中心化被中心化压制
             </span>
             </p>
 
