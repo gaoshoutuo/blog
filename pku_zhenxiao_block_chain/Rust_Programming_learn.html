@@ -364,12 +364,139 @@ let r3 = &mut s; // 大问题
 
 
                     5.3 方法语法
+                    就是存在于结构体 trait 泛型 enum之内的专属方法。例如我们对 rect结构体的求area函数进行 方法语法化
+                    struct rect{
+                    length:i32,
+                    width:i32,
+                    }
+                    impl rect{
+                        fn area(&self)->u32{
+                            return self.length*self.width;
+                    }
+                    }
+
+                    这就是一种rust当中的方法语法，我们这里借用self 也就是自身的指针，并不需要持有
+
+                    我们将方法语法放在 impl rect 块当中 然后其他方法也可以放在块当中 也可以 在开一个 impl rect块，这里面的区别第10章再说。
+                    Rust中并没有一个与 ->等价的符号 这个符号在c中就是 指针的调用方法或者域。但是在rust里面 是自动解引用的，就好象如下两行代码是等价的。
+                    这里也给我带来与c/c++的一种混乱，因为c/c++里面似乎对&的引用使用与指针使用是有区别的。
+                    p1.get_inrect(&p2)
+                    (&p1).get_inrect(&p2)
+                    这两句话等价，但是我们还是喜欢第二句话 只是借用引用
+
+                    关联函数 一种在impl里不需要实例对象self作为参数传入的方法，一般是作为为结构体返回新实例的一种函数
+
 
 
                     结构体并不是唯一一个创建自定义类型的方法，下面的枚举会增加你的工具箱。
                     注解 枚举 这些在Java中不是很重要的东西，在这里得到一些重视与深入，仔细研究Acala与parity web3招人的要求
                     不去练剑是错误的 江湖从未远离 需要承载更多，
                     前端工程师 后端工程师 区块链工程师 全栈工程师  属于区块链开创新时代的美好世界，去中心化被中心化压制
+
+
+                    6 enum 枚举以及模式匹配
+                    枚举是一种列举成员并定义类型的一种方法
+                    variants 成员
+                    option 一种可能有 也可能没有的各种类型的枚举
+                    match 匹配适合类型的模式
+                    if let 控制流枚举中的
+                    rust的枚举最接近一些函数式语言 ocaml 的代数数据类型
+                    双冒号就是枚举的使用类型
+                    前段是跨平台的 vue react这些 但是后端 c++ java go rust 是锁死的
+
+                    6.1 定义枚举
+                    枚举里面这些成员 varivants 跟枚举本身同一个类型 并且可以去接受一个参数类型，作为一种函数。这是一种满足
+                    面向对象里面的多态与继承，子类的概念。
+                    不过这里既然是函数式，恐怕划分面向对象与函数式里面会有一个更深的内涵本质。思考。
+
+
+
+                    我们举例一个枚举
+                    enum ip{
+                    v4,
+                    v6,
+                    }
+                    枚举的好处在于父类与子类 对类型进行一种统一  面向对象值得就是指向基类Object
+                    当我们使用枚举的时候 不知道是哪个成员 则可以用父类作为形式参数。
+                    例如 fn use_enum(ip:Ip){
+
+                    }
+
+
+                    这里使用 结构体来结合一些参数
+                    struct IpAddr{
+                        kind:Ip,
+                        addr:String,
+                    }
+                    let home=IpAddr{
+                        kind:Ip::v4,
+                        addr:String::from("127.0.0.1"),
+                    }
+
+                      let loop_out=IpAddr{
+                        kind:Ip::v6,
+                        addr:String::from("::1"),
+                    }
+                    我们也有一些简便不罗嗦的方法
+
+                    enum Ip{
+                    v4(String),
+                    v6(String),
+                    }
+                    let home = IpAddr::V4(String::from("127.0.0.1"));
+
+                    let loopback = IpAddr::V6(String::from("::1"));
+                    直接指定  这样相当于 IP.V4 然后传值这样
+                    这样我们就不需要额外的结构体了
+
+                    我们结合枚举以及一些其他参量
+
+
+                    enum Message{
+                    Quit,
+                    Move {x:i32,y:i32},
+                    Write(String),
+                    ChangeColor(i32,i32,i32),
+
+                }
+                枚举当中的特定方法
+                impl Message{
+                    fn call(&self){
+                        //println!("this is call 123");
+                    }
+
+                    使用option 枚举来避免 空与 非空 这种不严谨的表达判断  导致空指针错误造成世界上数十e美元的损失。
+                    本身的空值有可能只是某个时候是空的。
+                    enum option<-T>{
+                        some(T),
+                        none,
+                    }
+
+                    当option可以避免一种非空但是实际是空值的情况，就像Java new出一个对象的字段是默认或者有些为null的值
+                    这里option的好处
+
+                    Option<-T> 枚举是如此有用以至于它甚至被包含在了 prelude 之中，你不需要将其显式引入作用域。另外，它的成员也是如此，
+                    可以不需要 Option:: 前缀来直接使用 Some 和 None。即便如此 Option<-T> 也仍是常规的枚举，Some(T) 和 None 仍是 Option<-T> 的成员。
+
+                    #![allow(unused)]
+                    fn main() {
+                    let some_number = Some(5);
+                    let some_string = Some("a string");
+                    let absent_number: Option<-i32> = None;
+                    }
+                    当指代为none的时候 就要标明其类型，这样的判空避免空指针的方式真的很不错，因为这是一种有好处的none
+
+                    let x: i8 = 5;
+                    let y: Option<-i8> = Some(5);
+                    let sum = x + y;
+                    这会出现错误 因为 option<-i8>与i8不能相加，必然要去转化成i8类型先
+
+                    后面的部分主要是 option来判空的优越性 有一个真正的空值 而不是运行产生的空值
+
+
+                    6.2 match控制运算符   给enum的一种类似if else的控制流结构
+
+                    6.3
             </span>
             </p>
 
